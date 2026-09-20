@@ -1,0 +1,143 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String    @db.Text
+  image       String    @default("")
+  icon        String    @default("")
+  featured    Boolean   @default(false)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+}
+
+model Product {
+  id           String      @id @default(cuid())
+  name         String
+  slug         String      @unique
+  sku          String      @default("")
+  brand        String      @default("")
+  description  String      @db.Text
+  price        Int
+  comparePrice Int?
+  stock        Int         @default(0)
+  images       String      @default("[]") @db.Text
+  categoryId   String
+  category     Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  rating       Float       @default(0)
+  reviewCount  Int         @default(0)
+  featured     Boolean     @default(false)
+  isNew        Boolean     @default(false)
+  badge        String      @default("")
+  tags         String      @default("")
+  specs        String      @default("{}") @db.Text
+  sold         Int         @default(0)
+  active       Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  reviews      Review[]
+  orderItems   OrderItem[]
+
+  @@index([categoryId])
+  @@index([featured])
+  @@index([name])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  customerName  String
+  phone         String
+  email         String      @default("")
+  address       String      @db.Text
+  city          String
+  notes         String      @default("") @db.Text
+  subtotal      Int
+  shipping      Int         @default(0)
+  total         Int
+  paymentMethod String      @default("cod")
+  status        String      @default("pending")
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([status])
+  @@index([phone])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  price     Int
+  qty       Int
+  image     String   @default("")
+
+  @@index([orderId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  rating    Int
+  comment   String   @db.Text
+  approved  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @default("")
+  phone     String   @default("")
+  subject   String   @default("")
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Testimonial {
+  id       String  @id @default(cuid())
+  name     String
+  location String  @default("")
+  text     String  @db.Text
+  rating   Int     @default(5)
+  image    String  @default("")
+  featured Boolean @default(true)
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String   @default("Admin")
+  createdAt    DateTime @default(now())
+}
+
+model Setting {
+  key   String @id
+  value String @db.Text
+}
