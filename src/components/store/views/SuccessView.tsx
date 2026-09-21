@@ -46,7 +46,7 @@ export default function SuccessView({ orderNumber }: { orderNumber: string }) {
       toast.success("Copied!");
       window.setTimeout(() => setCopied(false), 2000);
     } else {
-      toast.error("Could not copy — please note down your order number.");
+      toast.error("Could not copy, please note down your order number.");
     }
   };
 

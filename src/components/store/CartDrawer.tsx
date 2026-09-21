@@ -62,7 +62,7 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
               <a
                 href="#/shop"
                 onClick={closeDrawer}
-                aria-label="Start shopping — browse the full store"
+                aria-label="Start shopping, browse the full store"
               >
                 Start shopping
               </a>

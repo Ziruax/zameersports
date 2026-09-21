@@ -7,7 +7,7 @@ const CACHE_KEY = "settings:all"
 
 const DEFAULTS: SettingsMap = {
   store_name: "Zameer Sports",
-  store_tagline: "Dinga's Complete Sports Centre — Cricket Specialists",
+  store_tagline: "Dinga's Complete Sports Centre & Cricket Specialists",
   phone: "+92 310 7220870",
   whatsapp: "923465002049",
   email: "info@zameersports.shop",

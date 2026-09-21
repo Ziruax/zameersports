@@ -45,7 +45,7 @@ export default function Footer({ categories, settings }: FooterProps) {
             </p>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-neutral-400">
-            Dinga&apos;s complete sports centre and cricket specialists — serving Kharian, Gujrat
+            Dinga&apos;s complete sports centre and cricket specialists, serving Kharian, Gujrat
             and all of Pakistan with authentic gear, honest wholesale rates and fast delivery.
           </p>
           <div className="mt-5 flex items-center gap-2">

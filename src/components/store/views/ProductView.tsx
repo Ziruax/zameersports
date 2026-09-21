@@ -82,7 +82,7 @@ export default function ProductView({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (product) {
-      document.title = `${product.name} — ${formatPrice(product.price)} | Zameer Sports`;
+      document.title = `${product.name} | Buy Online at Zameer Sports`;
     }
   }, [product]);
 
@@ -169,7 +169,7 @@ export default function ProductView({ slug }: { slug: string }) {
 
   const whatsappNumber = settings?.whatsapp || DEFAULT_WHATSAPP;
   const whatsappText = encodeURIComponent(
-    `Assalam-o-Alaikum! I want to order: ${product.name} — ${formatPrice(product.price)} (zameersports.shop)`,
+    `Assalam-o-Alaikum! I want to order: ${product.name} (${formatPrice(product.price)}) from zameersports.shop`,
   );
 
   const handleAdd = () => {
@@ -260,7 +260,7 @@ export default function ProductView({ slug }: { slug: string }) {
                 >
                   <Image
                     src={image}
-                    alt={`${product.name} — image ${i + 1}`}
+                    alt={`${product.name}, image ${i + 1}`}
                     fill
                     sizes="80px"
                     className="object-cover"
@@ -480,7 +480,7 @@ function ReviewsList({ productId }: { productId: string }) {
   if (!reviews || reviews.length === 0) {
     return (
       <p className="text-sm text-neutral-500">
-        No reviews yet — be the first to review this product.
+        No reviews yet. Be the first one to review this product.
       </p>
     );
   }
@@ -525,7 +525,7 @@ function ReviewForm({ productId, slug }: { productId: string; slug: string }) {
         body: JSON.stringify({ productId, ...data }),
       }),
     onSuccess: () => {
-      toast.success("Review submitted — Shukriya!");
+      toast.success("Review submitted, Shukriya!");
       setName("");
       setRating(0);
       setComment("");

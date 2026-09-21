@@ -342,11 +342,11 @@ function TrackForm({ initialOrderNumber }: { initialOrderNumber: string }) {
             <div>
               <p className="font-semibold text-amber-900">
                 {error instanceof ApiError && error.status === 404
-                  ? "Order not found — check your order number and the phone you used."
+                  ? "Order not found, please check your order number and the phone you used."
                   : "Could not look up your order right now. Please try again in a moment."}
               </p>
               <p className="mt-1 text-sm text-amber-800">
-                Both fields are required. Need help? WhatsApp us — we&apos;ll find it for you.
+                Both fields are required. Need help? WhatsApp us and we will find it for you.
               </p>
             </div>
           </CardContent>

@@ -139,7 +139,7 @@ export default function CheckoutView() {
                 Your cart is empty
               </h1>
               <p className="text-neutral-500">
-                Your cart is empty — add some gear first and come back to place your order.
+                Your cart is empty, add some gear first and come back to place your order.
               </p>
             </div>
             <Button asChild className="h-11 px-8 font-semibold">
@@ -177,7 +177,7 @@ export default function CheckoutView() {
       const message =
         err instanceof ApiError && err.message
           ? err.message
-          : "Something went wrong — please try again. Your cart is safe.";
+          : "Something went wrong, please try again. Your cart is safe.";
       toast.error(message);
       setPlacing(false);
     }
@@ -350,7 +350,7 @@ export default function CheckoutView() {
                                 Cash on Delivery
                               </span>
                               <span className="block text-sm leading-snug text-neutral-500">
-                                Pay cash when your order arrives — trusted across Pakistan
+                                Pay cash when your order arrives, trusted all over Pakistan
                               </span>
                             </span>
                           </label>
@@ -394,7 +394,7 @@ export default function CheckoutView() {
                       Placing Order…
                     </>
                   ) : (
-                    `Place Order — ${formatPrice(total)}`
+                    `Place Order (${formatPrice(total)})`
                   )}
                 </Button>
 

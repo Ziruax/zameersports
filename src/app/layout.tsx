@@ -20,37 +20,47 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://zameersports.shop";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Zameer Sports | Complete Sports Centre — Cricket Specialists in Dinga, Gujrat",
+    default: "Zameer Sports | Complete Sports Centre & Cricket Shop in Dinga, Gujrat",
     template: "%s | Zameer Sports",
   },
   description:
-    "Zameer Sports Dinga — cricket bats, football, volleyball, badminton, trophies, gifts, toys and gym gear. Cricket specialists serving Kharian, Gujrat and all of Pakistan with Pakistan-wide delivery and Cash on Delivery.",
+    "Zameer Sports Dinga is a trusted cricket shop in Pakistan. Buy original cricket bats, footballs, volleyballs, badminton rackets, trophies, gifts, toys and gym gear online with Cash on Delivery and Pakistan-wide delivery from Dinga, Gujrat.",
   keywords: [
     "cricket bat Pakistan",
     "sports shop Dinga",
     "Zameer Sports Dinga",
     "cricket store Gujrat",
     "buy cricket bat online Pakistan",
+    "cricket bat price in Pakistan",
+    "sports shop Kharian",
     "football volleyball badminton trophies gym",
+    "ZameerSports.shop",
   ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Zameer Sports | Complete Sports Centre — Cricket Specialists in Dinga, Gujrat",
+    title: "Zameer Sports | Complete Sports Centre & Cricket Shop in Dinga, Gujrat",
     description:
-      "Cricket bats, football, volleyball, badminton, trophies, gifts, toys & gym gear. Pakistan-wide delivery and Cash on Delivery from Dinga, Gujrat.",
+      "Original cricket bats, footballs, volleyballs, badminton rackets, trophies, gifts, toys and gym gear. Pakistan-wide delivery and Cash on Delivery from Dinga, Gujrat.",
     type: "website",
     siteName: "Zameer Sports",
     locale: "en_PK",
+    url: siteUrl,
     images: [
       {
         url: "/images/brand/hero-1.jpg",
         width: 1200,
         height: 630,
-        alt: "Zameer Sports — Dinga's complete sports centre",
+        alt: "Zameer Sports, Dinga's complete sports centre and cricket shop",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
+    title: "Zameer Sports | Complete Sports Centre & Cricket Shop in Dinga",
+    description:
+      "Original cricket bats and sports gear with Pakistan-wide delivery and Cash on Delivery.",
   },
   icons: {
     icon: "/images/brand/logo.png",
@@ -63,6 +73,8 @@ const jsonLd = {
   "@type": "SportingGoodsStore",
   name: "Zameer Sports",
   url: siteUrl,
+  logo: `${siteUrl}/images/brand/logo.png`,
+  image: `${siteUrl}/images/brand/hero-1.jpg`,
   telephone: "+92 310 7220870",
   address: {
     "@type": "PostalAddress",
@@ -71,7 +83,7 @@ const jsonLd = {
     addressRegion: "Kharian, Gujrat, Punjab",
     addressCountry: "PK",
   },
-  priceRange: "$$",
+  priceRange: "Rs 200 - Rs 45,000",
   sameAs: [
     "https://www.facebook.com/zameersports49",
     "https://www.facebook.com/ZameerSports",
@@ -85,6 +97,13 @@ const jsonLd = {
     latitude: 32.6405,
     longitude: 73.6945,
   },
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Zameer Sports",
+  url: siteUrl,
 };
 
 export default function RootLayout({
@@ -102,6 +121,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
       </body>
     </html>

@@ -149,7 +149,7 @@ export default function ContactView() {
       toast.success("Message sent! We'll get back to you soon.");
       form.reset();
     } catch {
-      toast.error("Message could not be sent — please WhatsApp or call us instead.");
+      toast.error("Message could not be sent, please WhatsApp or call us instead.");
     } finally {
       setSending(false);
     }
@@ -157,13 +157,13 @@ export default function ContactView() {
 
   const socials: { label: string; note: string; href: string; Icon: LucideIcon }[] = [
     {
-      label: "Facebook — Main Page",
+      label: "Facebook (Main Page)",
       note: "zameersports49",
       href: settings.facebook1,
       Icon: Facebook,
     },
     {
-      label: "Facebook — Sports Page",
+      label: "Facebook (Sports Page)",
       note: "ZameerSports",
       href: settings.facebook2,
       Icon: Facebook,

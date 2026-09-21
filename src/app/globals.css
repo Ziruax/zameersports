@@ -129,6 +129,32 @@
   letter-spacing: 0.02em;
 }
 
+/* Centered page container with side spacing on every screen.
+   Tailwind 4's built-in `container` no longer auto-centers, so we override
+   it here: auto margins fix the left-shifted layout on wide screens and
+   inline padding guarantees breathing room on small screens. */
+@utility container {
+  margin-inline: auto;
+  width: 100%;
+  padding-inline: 1rem;
+  @media (width >= 40rem) {
+    max-width: 40rem;
+    padding-inline: 1.5rem;
+  }
+  @media (width >= 48rem) {
+    max-width: 48rem;
+  }
+  @media (width >= 64rem) {
+    max-width: 64rem;
+  }
+  @media (width >= 80rem) {
+    max-width: 80rem;
+  }
+  @media (width >= 96rem) {
+    max-width: 96rem;
+  }
+}
+
 /* Slim scrollbar utility */
 .scrollbar-slim {
   scrollbar-width: thin;

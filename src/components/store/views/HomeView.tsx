@@ -17,7 +17,9 @@ import {
   Gift,
   Globe,
   Headphones,
+  MapPin,
   MessageCircle,
+  Quote,
   ShieldCheck,
   ShoppingCart,
   Star,
@@ -47,7 +49,7 @@ const HERO_SLIDES = [
   {
     image: "/images/brand/hero-1.jpg",
     headline: "Dinga's Complete Sports Centre",
-    sub: "Cricket specialists serving players & teams across Pakistan — from tape-ball to test cricket",
+    sub: "Cricket specialists serving players and teams all over Pakistan, from tape-ball to test cricket",
   },
   {
     image: "/images/brand/hero-2.jpg",
@@ -57,7 +59,7 @@ const HERO_SLIDES = [
   {
     image: "/images/brand/hero-3.jpg",
     headline: "Gear Up. Every Sport. Every Level.",
-    sub: "Football, volleyball, badminton, trophies, gifts, toys & gym — all under one roof",
+    sub: "Football, volleyball, badminton, trophies, gifts, toys and gym, all under one roof",
   },
 ];
 
@@ -83,22 +85,22 @@ const WHY_CARDS = [
   {
     Icon: ShieldCheck,
     title: "Authentic Branded Stock",
-    text: "Genuine brands and honest grades — every bat, ball and racket is quality-checked at our Dinga shop before it ships.",
+    text: "Genuine brands and honest grades. Every bat, ball and racket is quality-checked at our Dinga shop before it ships.",
   },
   {
     Icon: Tag,
     title: "Honest Wholesale Rates",
-    text: "Direct importer pricing on bats, volleyballs and club orders — the same fair rates we give local teams.",
+    text: "Direct importer pricing on bats, volleyballs and club orders, the same fair rates we are giving to local teams since years.",
   },
   {
     Icon: Truck,
     title: "Fast Delivery + COD",
-    text: "Pakistan-wide shipping with Cash on Delivery. Free delivery on orders over Rs 5,000.",
+    text: "Pakistan-wide shipping with Cash on Delivery. Free delivery on orders above Rs 5,000.",
   },
   {
     Icon: Wrench,
     title: "After-Sale Service",
-    text: "Bat knocking and re-gripping, stitch repairs and trophy engraving — we look after your gear.",
+    text: "Bat knocking and re-gripping, stitch repairs and trophy engraving. We look after your gear properly.",
   },
 ];
 
@@ -254,73 +256,106 @@ function TestimonialsCarousel({
     return () => clearInterval(timer);
   }, [maxIndex, perView, testimonials.length]);
 
+  const goTo = (i: number) => setIndex(Math.max(0, Math.min(maxIndex, i)));
+
   return (
-    <div className="overflow-hidden" aria-live="polite">
+    <div className="relative">
+      {/* Glow backdrop behind the cards */}
       <div
-        className="-mx-2 flex transition-transform duration-500 ease-out"
-        style={{ transform: `translateX(-${activeIndex * (100 / perView)}%)` }}
-      >
-        {testimonials.map((t) => (
-          <div
-            key={t.id}
-            className="basis-full px-2 sm:basis-1/2 lg:basis-1/3"
-          >
-            <Card className="h-full rounded-xl">
-              <CardContent className="flex h-full flex-col gap-4">
-                <RatingStars rating={t.rating} size="md" />
-                <blockquote className="flex-1 text-sm leading-relaxed text-neutral-700">
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-10 left-1/2 h-64 w-[36rem] max-w-full -translate-x-1/2 rounded-full bg-emerald-500/10 blur-3xl"
+      />
+
+      <div className="relative overflow-hidden" aria-live="polite">
+        <div
+          className="-mx-3 flex transition-transform duration-500 ease-out"
+          style={{ transform: `translateX(-${activeIndex * (100 / perView)}%)` }}
+        >
+          {testimonials.map((t, i) => (
+            <div
+              key={t.id}
+              className="basis-full px-3 sm:basis-1/2 lg:basis-1/3"
+            >
+              <figure className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.06] p-6 backdrop-blur-sm transition-colors duration-200 hover:border-amber-500/30 hover:bg-white/[0.09]">
+                <div className="flex items-center justify-between">
+                  <Quote className="-scale-x-100 text-amber-500/80" aria-hidden="true" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-emerald-200/50">
+                    Verified Buyer
+                  </span>
+                </div>
+                <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-emerald-50/90">
                   &ldquo;{t.text}&rdquo;
                 </blockquote>
-                <div className="flex items-center gap-3">
+                <figcaption className="mt-5 flex items-center gap-3 border-t border-white/10 pt-4">
                   <span
                     aria-hidden="true"
-                    className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-700 text-sm font-bold text-white"
+                    className={`flex size-11 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                      i % 2 === 0
+                        ? "bg-amber-500 text-amber-950"
+                        : "bg-emerald-400 text-emerald-950"
+                    }`}
                   >
                     {initialsOf(t.name)}
                   </span>
-                  <div>
-                    <p className="text-sm font-semibold text-neutral-900">{t.name}</p>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-white">{t.name}</p>
                     {t.location ? (
-                      <p className="text-xs text-neutral-500">{t.location}</p>
+                      <p className="mt-0.5 flex items-center gap-1 text-xs text-emerald-100/60">
+                        <MapPin className="size-3 shrink-0" aria-hidden="true" />
+                        {t.location}
+                      </p>
                     ) : null}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        ))}
+                  <span className="ml-auto shrink-0">
+                    <RatingStars rating={t.rating} size="sm" />
+                  </span>
+                </figcaption>
+              </figure>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* Arrows */}
+      {maxIndex > 0 ? (
+        <>
+          <button
+            type="button"
+            onClick={() => goTo(activeIndex - 1)}
+            aria-label="Previous testimonials"
+            disabled={activeIndex === 0}
+            className="absolute top-1/2 -left-2 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-emerald-900/80 text-white shadow-lg backdrop-blur transition-colors hover:bg-emerald-800 disabled:pointer-events-none disabled:opacity-30 lg:flex lg:-left-5"
+          >
+            <ChevronLeft className="size-5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => goTo(activeIndex + 1)}
+            aria-label="Next testimonials"
+            disabled={activeIndex === maxIndex}
+            className="absolute top-1/2 -right-2 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-emerald-900/80 text-white shadow-lg backdrop-blur transition-colors hover:bg-emerald-800 disabled:pointer-events-none disabled:opacity-30 lg:flex lg:-right-5"
+          >
+            <ChevronRight className="size-5" aria-hidden="true" />
+          </button>
+        </>
+      ) : null}
 
       {/* Dots */}
       {maxIndex > 0 ? (
-        <div className="mt-6 flex items-center justify-center gap-2">
+        <div className="mt-7 flex items-center justify-center gap-2">
           {Array.from({ length: maxIndex + 1 }, (_, i) => (
             <button
               key={i}
               type="button"
-              onClick={() => setIndex(i)}
+              onClick={() => goTo(i)}
               aria-label={`Show testimonials page ${i + 1}`}
               className={`h-2 rounded-full transition-all ${
-                i === activeIndex ? "w-6 bg-emerald-700" : "w-2 bg-neutral-300 hover:bg-neutral-400"
+                i === activeIndex ? "w-7 bg-amber-500" : "w-2 bg-white/30 hover:bg-white/60"
               }`}
             />
           ))}
         </div>
       ) : null}
-
-      <div className="mt-8 flex flex-col items-center gap-3">
-        <p className="text-xs text-neutral-500">
-          Real reviews from players, clubs and schools across Gujrat district.
-        </p>
-        {facebookUrl ? (
-          <Button asChild variant="outline" className="h-11 font-semibold">
-            <a href={facebookUrl} target="_blank" rel="noreferrer">
-              Watch video reviews on Facebook
-              <ExternalLink className="size-4" aria-hidden="true" />
-            </a>
-          </Button>
-        ) : null}
-      </div>
     </div>
   );
 }
@@ -388,12 +423,77 @@ function Newsletter() {
   );
 }
 
+/* ------------------------------------------------------------------- FAQ */
+
+const FAQS = [
+  {
+    q: "Do you deliver all over Pakistan?",
+    a: "Yes, we deliver to every city and town of Pakistan. Orders above Rs 5,000 get free delivery and you can pay cash when the parcel reaches you.",
+  },
+  {
+    q: "Are your cricket bats original?",
+    a: "100% original. We stock genuine English willow and Kashmir willow bats from Pakistan's top makers, and every bat is checked by us in the shop before shipping.",
+  },
+  {
+    q: "Do you give bat knocking and grip service?",
+    a: "Yes, we do bat knocking, grip changing and small bat repairs in our Dinga shop. WhatsApp us and we will guide you properly.",
+  },
+  {
+    q: "Can clubs and schools order in bulk?",
+    a: "Definitely. We supply full kits to clubs, schools and tournaments on wholesale rates. Call or WhatsApp 0346 5002049 and we will make a package for you.",
+  },
+  {
+    q: "How can I track my order?",
+    a: "When your order is placed you get an order number. Enter it on the Track Order page with your phone number and see the live status.",
+  },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+
+function FaqSection() {
+  return (
+    <section aria-label="Frequently asked questions" className="container py-14">
+      <SectionHeading eyebrow="Good to Know" title="Questions People Ask Us" />
+      <div className="mx-auto max-w-3xl divide-y divide-neutral-200 rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        {FAQS.map((f, i) => (
+          <details key={f.q} className="group px-5 py-4 sm:px-6" open={i === 0}>
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-bold text-neutral-900 marker:content-none sm:text-base">
+              {f.q}
+              <ChevronRight
+                className="size-5 shrink-0 text-emerald-700 transition-transform duration-200 group-open:rotate-90"
+                aria-hidden="true"
+              />
+            </summary>
+            <p className="mt-3 text-sm leading-relaxed text-neutral-600">{f.a}</p>
+          </details>
+        ))}
+      </div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+    </section>
+  );
+}
+
 /* ----------------------------------------------------------------- HomeView */
 
 export default function HomeView({ initialData }: { initialData: StoreInitialData }) {
   const { categories, featured, testimonials, settings } = initialData;
   const featuredItems = featured.items;
   const whatsapp = settings.whatsapp?.replace(/\D/g, "") || "";
+  const avgRating =
+    testimonials.length > 0
+      ? testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length
+      : 0;
 
   return (
     <div>
@@ -585,14 +685,66 @@ export default function HomeView({ initialData }: { initialData: StoreInitialDat
 
       {/* Testimonials */}
       {testimonials.length > 0 ? (
-        <section aria-label="Customer testimonials" className="container py-14">
-          <SectionHeading eyebrow="Testimonials" title="What Players Say" />
-          <TestimonialsCarousel
-            testimonials={testimonials}
-            facebookUrl={settings.facebook2}
+        <section
+          aria-label="Customer testimonials"
+          className="relative overflow-hidden bg-emerald-950 py-14"
+        >
+          {/* Decorative watermark quote */}
+          <Quote
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-6 -left-6 size-56 rotate-12 text-emerald-900/50"
           />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.12),transparent_60%)]"
+          />
+          <div className="container relative">
+            <SectionHeading
+              eyebrow="Testimonials"
+              title="What Players Say"
+              tone="dark"
+              action={
+                <div className="flex items-center gap-2.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-2 backdrop-blur">
+                  <span
+                    className="text-sm font-bold text-amber-400"
+                    aria-label={`Average rating ${avgRating.toFixed(1)} out of 5 from ${testimonials.length} reviews`}
+                  >
+                    {avgRating.toFixed(1)}
+                  </span>
+                  <RatingStars rating={avgRating} size="sm" />
+                  <span className="text-xs font-semibold text-amber-100/80">
+                    {testimonials.length} reviews
+                  </span>
+                </div>
+              }
+            />
+            <TestimonialsCarousel
+              testimonials={testimonials}
+              facebookUrl={settings.facebook2}
+            />
+            <div className="mt-8 flex flex-col items-center gap-3">
+              <p className="text-xs text-emerald-100/60">
+                Real reviews from players, clubs and schools of Gujrat district.
+              </p>
+              {settings.facebook2 ? (
+                <Button
+                  asChild
+                  variant="outline"
+                  className="h-11 border-amber-500/40 bg-transparent font-semibold text-amber-100 hover:bg-amber-500/10 hover:text-white"
+                >
+                  <a href={settings.facebook2} target="_blank" rel="noreferrer">
+                    Watch video reviews on Facebook
+                    <ExternalLink className="size-4" aria-hidden="true" />
+                  </a>
+                </Button>
+              ) : null}
+            </div>
+          </div>
         </section>
       ) : null}
+
+      {/* FAQ */}
+      <FaqSection />
 
       {/* Newsletter */}
       <Newsletter />

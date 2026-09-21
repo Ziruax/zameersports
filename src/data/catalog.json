@@ -5,7 +5,7 @@
       "name": "Cricket",
       "icon": "Zap",
       "image": "/images/categories/cricket.jpg",
-      "description": "Premium cricket bats, leather and tape balls, and full protective gear for every level — from street tape-ball to hard-ball league cricket. As Dinga's cricket specialists, we stock English and Kashmir willow bats from Pakistan's top makers, including our own Zameer Legend flagship.",
+      "description": "Premium cricket bats, leather and tape balls, and full protective gear for every level, from street tape-ball to hard-ball league cricket. As Dinga's cricket specialists, we stock English and Kashmir willow bats from Pakistan's top makers, including our own Zameer Legend flagship.",
       "featured": true,
       "sortOrder": 1
     },
@@ -23,7 +23,7 @@
       "name": "Volleyball",
       "icon": "CircleDot",
       "image": "/images/categories/volleyball.jpg",
-      "description": "Jagga match volleyballs, training balls, nets, and knee pads — the heart of village tournament season across Gujrat and Punjab. We personally supply and sponsor local clubs, so we only stock balls that last full tournaments.",
+      "description": "Jagga match volleyballs, training balls, nets, and knee pads, the heart of village tournament season across Gujrat and Punjab. We personally supply and sponsor local clubs, so we only stock balls that last full tournaments.",
       "featured": false,
       "sortOrder": 3
     },
@@ -41,7 +41,7 @@
       "name": "Trophies & Awards",
       "icon": "Trophy",
       "image": "/images/categories/trophies.png",
-      "description": "Champion trophies, shields, medals, and crystal awards for tournaments, schools, and corporate events. We sponsor local leagues ourselves — so we know exactly what winners deserve to lift.",
+      "description": "Champion trophies, shields, medals, and crystal awards for tournaments, schools, and corporate events. We sponsor local leagues ourselves, so we know exactly what winners deserve to lift.",
       "featured": true,
       "sortOrder": 5
     },
@@ -68,7 +68,7 @@
       "name": "Gym & Fitness",
       "icon": "Dumbbell",
       "image": "/images/categories/gym.jpg",
-      "description": "Dumbbells, skipping ropes, resistance bands, gloves, and mats for home workouts and gym training. Stocked on request from our own customers who asked for exercise gear — everything you need to stay fit.",
+      "description": "Dumbbells, skipping ropes, resistance bands, gloves, and mats for home workouts and gym training. Stocked on request from our own customers who asked for exercise gear, everything you need to stay fit.",
       "featured": false,
       "sortOrder": 8
     }
@@ -90,7 +90,7 @@
       "reviewCount": 47,
       "sold": 320,
       "tags": "cricket,bat,english willow,grade 1,flagship,match",
-      "shortDescription": "Our flagship Grade-1 English willow bat for the 2026 season — handpicked, pressed, and company-verified at our Dinga shop.",
+      "shortDescription": "Our flagship Grade-1 English willow bat for the 2026 season, handpicked, pressed, and company-verified at our Dinga shop.",
       "description": "The Zameer Legend 2026 is our flagship Grade-1 English willow bat, handpicked for straight grains and pressed the traditional way for a huge sweet spot. Built for serious league and hard-ball players who want professional pickup without an import price tag. Comes with our shop guarantee and free delivery anywhere in Pakistan. Every bat is checked personally before it leaves Aslah Market, Board Chowk, Dinga."
     },
     {
@@ -109,8 +109,8 @@
       "reviewCount": 21,
       "sold": 95,
       "tags": "cricket,bat,english willow,club",
-      "shortDescription": "Genuine English willow performance at a mid-range price — a favourite among district-level players.",
-      "description": "The GA Qasim English willow bat gives you that classic willow punch and light pickup that club cricketers across Gujrat trust. Ideal for hard-ball league cricket and long net sessions in Punjab's dry summer heat. A genuine English willow bat at a price that makes sense — backed by our shop guarantee."
+      "shortDescription": "Genuine English willow performance at a mid-range price, a favourite among district-level players.",
+      "description": "The GA Qasim English willow bat gives you that classic willow punch and light pickup that club cricketers across Gujrat trust. Ideal for hard-ball league cricket and long net sessions in Punjab's dry summer heat. A genuine English willow bat at a price that makes sense, backed by our shop guarantee."
     },
     {
       "slug": "saki-power-bat",
@@ -128,8 +128,8 @@
       "reviewCount": 38,
       "sold": 260,
       "tags": "cricket,bat,kashmir willow,tape ball,power",
-      "shortDescription": "The famous 'Brand of Pakistan' Saki Power bat — big hits for tape-ball and tennis-ball cricket.",
-      "description": "The Saki Power Hit Edition is the bat everyone asks for after seeing it in our videos — thick Kashmir willow edges built for six-hitting. Perfect for tape-ball and tennis-ball cricket on the streets and grounds of Punjab. It takes hit after hit without splitting, season after season. At this price it is simply the best value power bat in the market."
+      "shortDescription": "The famous 'Brand of Pakistan' Saki Power bat, big hits for tape-ball and tennis-ball cricket.",
+      "description": "The Saki Power Hit Edition is the bat everyone asks for after seeing it in our videos, thick Kashmir willow edges built for six-hitting. Perfect for tape-ball and tennis-ball cricket on the streets and grounds of Punjab. It takes hit after hit without splitting, season after season. At this price it is simply the best value power bat in the market."
     },
     {
       "slug": "student-tennis-bat",
@@ -147,7 +147,7 @@
       "reviewCount": 26,
       "sold": 210,
       "tags": "cricket,bat,tennis ball,student,kids",
-      "shortDescription": "A light, durable bat made for tennis-ball cricket — perfect for students and street matches.",
+      "shortDescription": "A light, durable bat made for tennis-ball cricket, perfect for students and street matches.",
       "description": "Designed for young players and students who play tennis-ball cricket after school and on weekends. The lightweight handle and thick blade make it easy to control while still packing a punch. Built to survive concrete pitches and rooftop games that destroy ordinary bats."
     },
     {
@@ -166,8 +166,8 @@
       "reviewCount": 17,
       "sold": 88,
       "tags": "cricket,bat,kashmir willow,club,hard ball",
-      "shortDescription": "MB Malik's Kashmir willow bat — factory-finished quality trusted by club players across Pakistan.",
-      "description": "MB Malik is one of Sialkot's most respected bat makers, and this Kashmir willow bat shows why — clean finishing, good balance, and reliable performance. A great step-up bat for club and school hard-ball cricket. Cheaper than English willow but tough enough for Pakistani wickets."
+      "shortDescription": "MB Malik's Kashmir willow bat, factory-finished quality trusted by club players across Pakistan.",
+      "description": "MB Malik is one of Sialkot's most respected bat makers, and this Kashmir willow bat shows why, clean finishing, good balance, and reliable performance. A great step-up bat for club and school hard-ball cricket. Cheaper than English willow but tough enough for Pakistani wickets."
     },
     {
       "slug": "leather-ball-match",
@@ -185,7 +185,7 @@
       "reviewCount": 24,
       "sold": 175,
       "tags": "cricket,ball,leather,match,hard ball",
-      "shortDescription": "Four-piece match leather ball from CA Sports — tournament-grade cork core and hand-stitched hide.",
+      "shortDescription": "Four-piece match leather ball from CA Sports, tournament-grade cork core and hand-stitched hide.",
       "description": "A proper four-piece leather ball with a layered cork core and hand-stitched alum-tanned hide, made for hard-ball match cricket. Holds its shape and seam through full-length innings on dry Pakistani pitches. The same quality used in the local league matches we sponsor."
     },
     {
@@ -204,8 +204,8 @@
       "reviewCount": 19,
       "sold": 140,
       "tags": "cricket,ball,leather,club,practice",
-      "shortDescription": "Two-piece club leather ball — honest quality for nets, practice, and club matches.",
-      "description": "The HS two-piece leather ball is our everyday club ball — durable, well-seamed, and priced for regular practice. Perfect for nets, school matches, and tape-ball graduates stepping into hard-ball cricket. Keeps its colour and shape far longer than unbranded alternatives."
+      "shortDescription": "Two-piece club leather ball, honest quality for nets, practice, and club matches.",
+      "description": "The HS two-piece leather ball is our everyday club ball, durable, well-seamed, and priced for regular practice. Perfect for nets, school matches, and tape-ball graduates stepping into hard-ball cricket. Keeps its colour and shape far longer than unbranded alternatives."
     },
     {
       "slug": "tennis-balls-pack",
@@ -223,8 +223,8 @@
       "reviewCount": 44,
       "sold": 380,
       "tags": "cricket,ball,tennis ball,street cricket",
-      "shortDescription": "Pack of 3 heavy tennis cricket balls — the standard ball for street and tape-ball cricket.",
-      "description": "These heavy tennis balls are the standard for street cricket across Pakistan — firm bounce, long life, and consistent flight. Great for tennis-ball matches, fielding practice, and warming up before hard-ball games. One pack keeps the whole mohalla playing for weeks."
+      "shortDescription": "Pack of 3 heavy tennis cricket balls, the standard ball for street and tape-ball cricket.",
+      "description": "These heavy tennis balls are the standard for street cricket across Pakistan, firm bounce, long life, and consistent flight. Great for tennis-ball matches, fielding practice, and warming up before hard-ball games. One pack keeps the whole mohalla playing for weeks."
     },
     {
       "slug": "tape-balls-pack",
@@ -242,7 +242,7 @@
       "reviewCount": 52,
       "sold": 500,
       "tags": "cricket,ball,tape ball,street cricket,pakistan",
-      "shortDescription": "Pack of 6 professional tape balls — pre-taped and ready for the street cricket classic.",
+      "shortDescription": "Pack of 6 professional tape balls, pre-taped and ready for the street cricket classic.",
       "description": "Tape-ball cricket is Pakistan's own game, and these ready-taped balls save you the effort of taping tennis balls yourself. Even weight, proper seam grip, and tape that stays on through full matches. Sold in a pack of six so your team never runs out mid-innings."
     },
     {
@@ -261,7 +261,7 @@
       "reviewCount": 14,
       "sold": 76,
       "tags": "cricket,protection,pads,batting",
-      "shortDescription": "Men's pro batting pads with high-density protection — light enough for long innings.",
+      "shortDescription": "Men's pro batting pads with high-density protection, light enough for long innings.",
       "description": "SG pro pads use high-density foam and cane reinforcement to protect against real leather-ball pace. The traditional cane face handles hard wickets and unpredictable bounce. Light weight means less fatigue through long innings in Punjab's summer heat."
     },
     {
@@ -281,7 +281,7 @@
       "sold": 82,
       "tags": "cricket,protection,gloves,batting",
       "shortDescription": "Men's pro batting gloves with sheepskin palm and sausage-finger protection.",
-      "description": "CA Sports pro gloves give you grip and protection in one — padded fingers, sheepskin palm, and mesh back for airflow. Essential for anyone facing the leather ball. They stay comfortable even when you are batting through the hottest part of the day."
+      "description": "CA Sports pro gloves give you grip and protection in one, padded fingers, sheepskin palm, and mesh back for airflow. Essential for anyone facing the leather ball. They stay comfortable even when you are batting through the hottest part of the day."
     },
     {
       "slug": "cricket-helmet",
@@ -299,7 +299,7 @@
       "reviewCount": 12,
       "sold": 64,
       "tags": "cricket,protection,helmet,safety",
-      "shortDescription": "Steel-grill batting helmet with adjustable fit — essential protection for hard-ball cricket.",
+      "shortDescription": "Steel-grill batting helmet with adjustable fit, essential protection for hard-ball cricket.",
       "description": "A proper steel-grill helmet is non-negotiable against the leather ball, and this SG model fits securely with an adjustable back strap. Good ventilation keeps your head cool during long innings. Recommended for every junior and club player who visits our shop."
     },
     {
@@ -318,8 +318,8 @@
       "reviewCount": 29,
       "sold": 190,
       "tags": "cricket,shoes,spikes,footwear",
-      "shortDescription": "The Gold Pro 360 cricket shoes our customers line up for — spikes plus cushioned comfort.",
-      "description": "The Gold Pro 360 is the shoe we showcase in our shop videos — lightweight, grippy spikes for quick singles and sharp fielding. The cushioned sole protects knees on the hard, dry outfields common across Punjab. Trusted by local league players all season long."
+      "shortDescription": "The Gold Pro 360 cricket shoes our customers line up for, spikes plus cushioned comfort.",
+      "description": "The Gold Pro 360 is the shoe we showcase in our shop videos, lightweight, grippy spikes for quick singles and sharp fielding. The cushioned sole protects knees on the hard, dry outfields common across Punjab. Trusted by local league players all season long."
     },
     {
       "slug": "cricket-kit-bag",
@@ -337,7 +337,7 @@
       "reviewCount": 9,
       "sold": 48,
       "tags": "cricket,bag,kit bag,storage",
-      "shortDescription": "Wheelie kit bag that carries your full kit — bat, pads, gloves, and helmet — with ease.",
+      "shortDescription": "Wheelie kit bag that carries your full kit, bat, pads, gloves, and helmet, with ease.",
       "description": "This wheelie kit bag swallows two bats, full pads, gloves, helmet, and shoes with room for your whites. The trolley handle and wheels save your shoulders and back on match-day travel between villages and grounds. Heavy-duty fabric survives bus rides and rickshaw journeys."
     },
     {
@@ -357,7 +357,7 @@
       "sold": 110,
       "tags": "cricket,stumps,bails,match equipment",
       "shortDescription": "Full wooden stumps set (6 stumps + bails) for matches at both ends.",
-      "description": "Proper turned-wood stumps with fitted bails — enough for a complete match setup at both ends of the pitch. The wood is seasoned to survive ball after ball on matting and turf wickets. Includes 6 stumps and 2 sets of bails."
+      "description": "Proper turned-wood stumps with fitted bails, enough for a complete match setup at both ends of the pitch. The wood is seasoned to survive ball after ball on matting and turf wickets. Includes 6 stumps and 2 sets of bails."
     },
     {
       "slug": "wicket-keeping-gloves",
@@ -376,7 +376,7 @@
       "sold": 42,
       "tags": "cricket,gloves,wicket keeping,protection",
       "shortDescription": "SG wicket-keeping gloves with strong pockets and grip for fast bowling.",
-      "description": "SG keeping gloves give keepers the confidence to stand up or back — deep pockets, strong webbing, and a grippy palm. Made for long days behind the stumps in hot weather with breathable backing. The choice of local league keepers."
+      "description": "SG keeping gloves give keepers the confidence to stand up or back, deep pockets, strong webbing, and a grippy palm. Made for long days behind the stumps in hot weather with breathable backing. The choice of local league keepers."
     },
     {
       "slug": "football-match-size5",
@@ -394,7 +394,7 @@
       "reviewCount": 31,
       "sold": 210,
       "tags": "football,soccer,ball,match,size 5",
-      "shortDescription": "Adidas match football, size 5 — tournament-grade ball for serious games.",
+      "shortDescription": "Adidas match football, size 5, tournament-grade ball for serious games.",
       "description": "A genuine size-5 match ball with true flight, soft touch, and stitched construction that keeps its shape. Made for club tournaments and serious school matches on grass and dirt pitches alike. When the final is on the line, you want a ball that behaves."
     },
     {
@@ -414,7 +414,7 @@
       "sold": 130,
       "tags": "football,soccer,ball,training,size 5",
       "shortDescription": "Durable size-5 training football that handles daily practice on hard grounds.",
-      "description": "The Vector X training ball is built for the daily grind — machine-stitched and tough enough for hard grounds and rough surfaces. Holds air and shape through weeks of practice sessions. The smart pick for academies and school teams on a budget."
+      "description": "The Vector X training ball is built for the daily grind, machine-stitched and tough enough for hard grounds and rough surfaces. Holds air and shape through weeks of practice sessions. The smart pick for academies and school teams on a budget."
     },
     {
       "slug": "football-junior-size4",
@@ -432,8 +432,8 @@
       "reviewCount": 11,
       "sold": 66,
       "tags": "football,soccer,ball,junior,kids,size 4",
-      "shortDescription": "Size-4 junior football designed for younger players — lighter and easier to control.",
-      "description": "The size-4 ball is the right weight for players under 12 — easier on the foot and better for developing technique. Nivia quality at a price parents appreciate. Perfect for school games and evening street football."
+      "shortDescription": "Size-4 junior football designed for younger players, lighter and easier to control.",
+      "description": "The size-4 ball is the right weight for players under 12, easier on the foot and better for developing technique. Nivia quality at a price parents appreciate. Perfect for school games and evening street football."
     },
     {
       "slug": "football-boots",
@@ -451,7 +451,7 @@
       "reviewCount": 22,
       "sold": 98,
       "tags": "football,boots,cleats,firm ground,footwear",
-      "shortDescription": "Firm-ground football boots with real grip — built for quick turns and hard grounds.",
+      "shortDescription": "Firm-ground football boots with real grip, built for quick turns and hard grounds.",
       "description": "Puma firm-ground boots give you the traction and touch for real matches, with a stud pattern made for natural and hard ground. The snug fit supports sharp cuts and sprints in Punjab's dry-season conditions. A genuine branded boot at a fair local price."
     },
     {
@@ -470,8 +470,8 @@
       "reviewCount": 10,
       "sold": 58,
       "tags": "football,shin guards,protection,safety",
-      "shortDescription": "Protective shin guards (pair) — light, tough, and required for every match.",
-      "description": "Nike shin guards absorb the tackles that come with competitive football. Lightweight slip-in design that does not slow you down or overcrowd your socks. An essential for every school and club player — referees check for them."
+      "shortDescription": "Protective shin guards (pair), light, tough, and required for every match.",
+      "description": "Nike shin guards absorb the tackles that come with competitive football. Lightweight slip-in design that does not slow you down or overcrowd your socks. An essential for every school and club player, referees check for them."
     },
     {
       "slug": "goalkeeper-gloves",
@@ -508,8 +508,8 @@
       "reviewCount": 33,
       "sold": 285,
       "tags": "volleyball,ball,match,jagga,tournament",
-      "shortDescription": "Jagga Super — the match-grade volleyball that powers village tournaments across Punjab.",
-      "description": "Jagga Super is the exact ball we supply to village volleyball tournaments in Gujrat and Kharian — genuine leather-feel cover with a true, controlled flight. It takes the smashing of full tournament seasons without losing shape. Available at wholesale rates for clubs buying in quantity."
+      "shortDescription": "Jagga Super, the match-grade volleyball that powers village tournaments across Punjab.",
+      "description": "Jagga Super is the exact ball we supply to village volleyball tournaments in Gujrat and Kharian, genuine leather-feel cover with a true, controlled flight. It takes the smashing of full tournament seasons without losing shape. Available at wholesale rates for clubs buying in quantity."
     },
     {
       "slug": "jagga-volleyball-gold",
@@ -527,7 +527,7 @@
       "reviewCount": 25,
       "sold": 160,
       "tags": "volleyball,ball,premium,jagga,tournament",
-      "shortDescription": "Jagga Gold — the premium tournament volleyball for serious leagues.",
+      "shortDescription": "Jagga Gold, the premium tournament volleyball for serious leagues.",
       "description": "The Jagga Gold is the top of the Jagga range, with a softer touch and better grip for setters and spikers. Chosen for finals and prestigious tournament matches. When clubs from Chak Jani to Kirnana want the best, this is the ball."
     },
     {
@@ -546,7 +546,7 @@
       "reviewCount": 13,
       "sold": 92,
       "tags": "volleyball,ball,training,practice",
-      "shortDescription": "Molten training volleyball — everyday quality for practice and school games.",
+      "shortDescription": "Molten training volleyball, everyday quality for practice and school games.",
       "description": "Molten's training ball offers reliable bounce and durability for daily practice sessions. Great for school PE, warm-ups, and friendly matches. A trusted international brand at a very reasonable price."
     },
     {
@@ -565,7 +565,7 @@
       "reviewCount": 6,
       "sold": 28,
       "tags": "volleyball,net,court,tournament equipment",
-      "shortDescription": "Professional volleyball net — regulation size, made for tournament courts.",
+      "shortDescription": "Professional volleyball net, regulation size, made for tournament courts.",
       "description": "A regulation professional net with strong cable and durable tape that survives outdoor tournament seasons. Easy to tension between posts and stays true through long matches. The same class of net we set up for our sponsored tournaments."
     },
     {
@@ -584,8 +584,8 @@
       "reviewCount": 9,
       "sold": 51,
       "tags": "volleyball,knee pads,protection,safety",
-      "shortDescription": "Nike volleyball knee pads — protect your knees through every dive and dig.",
-      "description": "Diving saves are part of volleyball — Nike knee pads absorb the impact of hard court surfaces. Flexible enough not to limit movement, tough enough for weekly tournaments. A must for every serious player and setter."
+      "shortDescription": "Nike volleyball knee pads, protect your knees through every dive and dig.",
+      "description": "Diving saves are part of volleyball, Nike knee pads absorb the impact of hard court surfaces. Flexible enough not to limit movement, tough enough for weekly tournaments. A must for every serious player and setter."
     },
     {
       "slug": "yonex-carbon-racket",
@@ -603,8 +603,8 @@
       "reviewCount": 27,
       "sold": 145,
       "tags": "badminton,racket,yonex,carbon,professional",
-      "shortDescription": "Yonex carbon badminton racket — lightweight frame, real smash power.",
-      "description": "Yonex carbon rackets are the genuine article — light, stiff frames that convert arm speed into real smash power. Ideal for club players and advanced juniors playing competitive badminton. Supplied with a full cover and match-ready strings."
+      "shortDescription": "Yonex carbon badminton racket, lightweight frame, real smash power.",
+      "description": "Yonex carbon rackets are the genuine article, light, stiff frames that convert arm speed into real smash power. Ideal for club players and advanced juniors playing competitive badminton. Supplied with a full cover and match-ready strings."
     },
     {
       "slug": "badminton-racket-beginner",
@@ -622,7 +622,7 @@
       "reviewCount": 14,
       "sold": 78,
       "tags": "badminton,racket,beginner,li-ning",
-      "shortDescription": "Li-Ning beginner racket — everything a new player needs to start smashing.",
+      "shortDescription": "Li-Ning beginner racket, everything a new player needs to start smashing.",
       "description": "This Li-Ning beginner racket is perfect for family games in the courtyard and players new to badminton. A forgiving flexible shaft helps beginners generate power while learning technique. Durable enough for daily outdoor and indoor play."
     },
     {
@@ -641,8 +641,8 @@
       "reviewCount": 20,
       "sold": 122,
       "tags": "badminton,shuttlecock,feather,match",
-      "shortDescription": "Yonex feather shuttlecocks in a tube of 12 — match-grade flight and feel.",
-      "description": "Genuine feather shuttles give you the proper badminton experience — stable flight, crisp sound, and accurate drops. Yonex quality means each shuttle in the tube of 12 flies consistently. The choice for club matches and serious practice."
+      "shortDescription": "Yonex feather shuttlecocks in a tube of 12, match-grade flight and feel.",
+      "description": "Genuine feather shuttles give you the proper badminton experience, stable flight, crisp sound, and accurate drops. Yonex quality means each shuttle in the tube of 12 flies consistently. The choice for club matches and serious practice."
     },
     {
       "slug": "nylon-shuttlecocks",
@@ -660,8 +660,8 @@
       "reviewCount": 16,
       "sold": 105,
       "tags": "badminton,shuttlecock,nylon,practice",
-      "shortDescription": "Victor nylon shuttles (pack of 6) — long-lasting birds for practice and outdoor play.",
-      "description": "Nylon shuttles are the practical choice for daily practice — they survive dozens of rallies that destroy feather shuttles. Victor's nylon birds keep a stable flight even in an outdoor breeze. Perfect for school practice and casual games."
+      "shortDescription": "Victor nylon shuttles (pack of 6), long-lasting birds for practice and outdoor play.",
+      "description": "Nylon shuttles are the practical choice for daily practice, they survive dozens of rallies that destroy feather shuttles. Victor's nylon birds keep a stable flight even in an outdoor breeze. Perfect for school practice and casual games."
     },
     {
       "slug": "badminton-net-set",
@@ -679,8 +679,8 @@
       "reviewCount": 5,
       "sold": 30,
       "tags": "badminton,net,set,court,outdoor",
-      "shortDescription": "Complete badminton net set — set up a court anywhere in minutes.",
-      "description": "This Vector X net set turns any open space into a badminton court — net, posts, and everything included. Easy assembly makes it perfect for family events, school sports days, and village gatherings. Sturdy enough for regular outdoor use."
+      "shortDescription": "Complete badminton net set, set up a court anywhere in minutes.",
+      "description": "This Vector X net set turns any open space into a badminton court, net, posts, and everything included. Easy assembly makes it perfect for family events, school sports days, and village gatherings. Sturdy enough for regular outdoor use."
     },
     {
       "slug": "gold-trophy-12",
@@ -698,7 +698,7 @@
       "reviewCount": 35,
       "sold": 240,
       "tags": "trophy,gold,champion,award,tournament",
-      "shortDescription": "12-inch gold champion trophy — the cup every tournament winner lifts.",
+      "shortDescription": "12-inch gold champion trophy, the cup every tournament winner lifts.",
       "description": "Our 12-inch gold champion trophy is the one we hand to winning teams at our sponsored tournaments. Polished gold finish on a solid base with space for your event engraving. Impressive on any stage, from school sports days to village cricket league finals."
     },
     {
@@ -717,7 +717,7 @@
       "reviewCount": 18,
       "sold": 115,
       "tags": "trophy,silver,runner-up,award,tournament",
-      "shortDescription": "10-inch silver runner-up trophy — proper honour for the finalists.",
+      "shortDescription": "10-inch silver runner-up trophy, proper honour for the finalists.",
       "description": "Every final has two teams, and the runners-up deserve proper recognition too. This 10-inch silver cup matches our champion trophy in quality, with a sturdy base and classic design. Great for second place, best bowler, and special awards."
     },
     {
@@ -736,7 +736,7 @@
       "reviewCount": 22,
       "sold": 165,
       "tags": "medals,gold,ribbons,award,team",
-      "shortDescription": "Pack of 10 gold medals with ribbons — recognise the whole team.",
+      "shortDescription": "Pack of 10 gold medals with ribbons, recognise the whole team.",
       "description": "Ten gold medals with tri-colour ribbons, ready for your tournament's man-of-the-match and team awards. Solid feel and bright finish that photographs well on presentation day. The most economical way to honour every player."
     },
     {
@@ -755,8 +755,8 @@
       "reviewCount": 12,
       "sold": 74,
       "tags": "trophy,shield,championship,award,league",
-      "shortDescription": "Championship shield award — a wall-mounting centrepiece for league winners.",
-      "description": "The championship shield is the traditional prize for league champions — a large mounted shield with classic trim detail. It hangs proudly in club rooms for years, remembering the season forever. Our own Legends Cricket League champions receive shields like this."
+      "shortDescription": "Championship shield award, a wall-mounting centrepiece for league winners.",
+      "description": "The championship shield is the traditional prize for league champions, a large mounted shield with classic trim detail. It hangs proudly in club rooms for years, remembering the season forever. Our own Legends Cricket League champions receive shields like this."
     },
     {
       "slug": "crystal-award",
@@ -774,7 +774,7 @@
       "reviewCount": 7,
       "sold": 36,
       "tags": "trophy,crystal,award,certificate,corporate",
-      "shortDescription": "Crystal award trophy — an elegant choice for formal ceremonies.",
+      "shortDescription": "Crystal award trophy, an elegant choice for formal ceremonies.",
       "description": "For corporate events, formal ceremonies, and special honours, the crystal award brings real elegance. Light-catching faceted crystal on a polished base, ready for engraving. Increasingly popular for school results days and club presentations."
     },
     {
@@ -793,8 +793,8 @@
       "reviewCount": 13,
       "sold": 70,
       "tags": "gift,mug,personalized,sports,custom",
-      "shortDescription": "Personalized sports mug — add a name or team to make it theirs.",
-      "description": "A quality mug printed with a cricket or sports design of your choice, personalized with a name or team. The gift that gets used every single morning — for coaches, captains, and cricket-mad friends. Share your text on WhatsApp and we will prepare it for you."
+      "shortDescription": "Personalized sports mug, add a name or team to make it theirs.",
+      "description": "A quality mug printed with a cricket or sports design of your choice, personalized with a name or team. The gift that gets used every single morning, for coaches, captains, and cricket-mad friends. Share your text on WhatsApp and we will prepare it for you."
     },
     {
       "slug": "cricket-keychain-set",
@@ -812,8 +812,8 @@
       "reviewCount": 16,
       "sold": 98,
       "tags": "gift,keychain,cricket,mini,souvenir",
-      "shortDescription": "Cricket bat & ball keychain set — a small gift every fan loves.",
-      "description": "Mini metal cricket bat and ball keychains — the perfect little gift or tournament favour. Great for team goody bags, return gifts, and cricket-mad kids. A daily reminder of the game we all love."
+      "shortDescription": "Cricket bat & ball keychain set, a small gift every fan loves.",
+      "description": "Mini metal cricket bat and ball keychains, the perfect little gift or tournament favour. Great for team goody bags, return gifts, and cricket-mad kids. A daily reminder of the game we all love."
     },
     {
       "slug": "steel-water-bottle",
@@ -831,7 +831,7 @@
       "reviewCount": 15,
       "sold": 88,
       "tags": "gift,bottle,steel,water,hydration",
-      "shortDescription": "Milton 1L steel water bottle — cold water for hard sessions.",
+      "shortDescription": "Milton 1L steel water bottle, cold water for hard sessions.",
       "description": "Milton's 1-litre steel bottle keeps water cool through long matches and gym sessions in the summer heat. A tough stainless body that survives being dropped on the boundary rope. An honest, useful gift for any player."
     },
     {
@@ -850,8 +850,8 @@
       "reviewCount": 19,
       "sold": 112,
       "tags": "gift,souvenir,mini bat,autograph,cricket",
-      "shortDescription": "Mini autograph cricket bat — get the whole team to sign it.",
-      "description": "Our mini souvenir bat is the classic memento for winning teams and retiring players — collect the whole squad's autographs on the blade. Comes with a small stand for display. Also a great cake-topper surprise for cricket birthdays."
+      "shortDescription": "Mini autograph cricket bat, get the whole team to sign it.",
+      "description": "Our mini souvenir bat is the classic memento for winning teams and retiring players, collect the whole squad's autographs on the blade. Comes with a small stand for display. Also a great cake-topper surprise for cricket birthdays."
     },
     {
       "slug": "kids-cricket-set",
@@ -869,7 +869,7 @@
       "reviewCount": 28,
       "sold": 195,
       "tags": "toys,kids,cricket set,plastic,outdoor",
-      "shortDescription": "Complete kids cricket set — plastic bat, ball, and stumps for the next generation.",
+      "shortDescription": "Complete kids cricket set, plastic bat, ball, and stumps for the next generation.",
       "description": "Everything a young cricketer needs to start: a light plastic bat, soft balls, and stumps with a base. Safe for the youngest players and perfect for rooftop, courtyard, and street games. The gift that gets kids off screens and into the game."
     },
     {
@@ -888,8 +888,8 @@
       "reviewCount": 12,
       "sold": 84,
       "tags": "toys,kids,foam,football,soft",
-      "shortDescription": "Soft foam football for kids — safe indoor and outdoor fun.",
-      "description": "This lightweight foam football is safe for younger kids and indoor play — no broken windows, no tears. Soft but solid enough for real games in the courtyard. Bright colours that are easy to spot in the evening."
+      "shortDescription": "Soft foam football for kids, safe indoor and outdoor fun.",
+      "description": "This lightweight foam football is safe for younger kids and indoor play, no broken windows, no tears. Soft but solid enough for real games in the courtyard. Bright colours that are easy to spot in the evening."
     },
     {
       "slug": "frisbee-flying-disc",
@@ -907,8 +907,8 @@
       "reviewCount": 8,
       "sold": 46,
       "tags": "toys,frisbee,flying disc,outdoor,park",
-      "shortDescription": "Colourful flying disc — hours of throwing fun at the park.",
-      "description": "A properly balanced flying disc that flies straight and far — great for parks, picnics, and open grounds. Bright colours stay visible at dusk. Fun for all ages and a sneaky way to get everyone exercising."
+      "shortDescription": "Colourful flying disc, hours of throwing fun at the park.",
+      "description": "A properly balanced flying disc that flies straight and far, great for parks, picnics, and open grounds. Bright colours stay visible at dusk. Fun for all ages and a sneaky way to get everyone exercising."
     },
     {
       "slug": "table-tennis-set",
@@ -926,8 +926,8 @@
       "reviewCount": 11,
       "sold": 62,
       "tags": "toys,table tennis,ping pong,bats,indoor game",
-      "shortDescription": "Stag table tennis set — 2 bats and 3 balls for instant games.",
-      "description": "Stag is one of the most trusted table tennis brands, and this set covers the family instantly: two quality bats and three balls. Play on any table — dining, office, or a proper TT table. The classic rainy-day and evening game."
+      "shortDescription": "Stag table tennis set, 2 bats and 3 balls for instant games.",
+      "description": "Stag is one of the most trusted table tennis brands, and this set covers the family instantly: two quality bats and three balls. Play on any table, dining, office, or a proper TT table. The classic rainy-day and evening game."
     },
     {
       "slug": "dumbbell-set-20kg",
@@ -945,8 +945,8 @@
       "reviewCount": 23,
       "sold": 105,
       "tags": "gym,dumbbell,weights,home gym,strength",
-      "shortDescription": "20kg adjustable dumbbell set — a full home gym in one box.",
-      "description": "Adjustable plates let you build the 20kg set up or down for any exercise — curls, presses, rows, and more. The knurled grip and screw-lock collars keep everything secure mid-set. Our most popular home-gym item, stocked on request from our own customers."
+      "shortDescription": "20kg adjustable dumbbell set, a full home gym in one box.",
+      "description": "Adjustable plates let you build the 20kg set up or down for any exercise, curls, presses, rows, and more. The knurled grip and screw-lock collars keep everything secure mid-set. Our most popular home-gym item, stocked on request from our own customers."
     },
     {
       "slug": "speed-skipping-rope",
@@ -964,7 +964,7 @@
       "reviewCount": 17,
       "sold": 120,
       "tags": "gym,skipping rope,cardio,boxing,fitness",
-      "shortDescription": "Pro speed skipping rope — the boxer's favourite cardio tool.",
+      "shortDescription": "Pro speed skipping rope, the boxer's favourite cardio tool.",
       "description": "A ball-bearing speed rope that spins fast and smooth for double-unders and cardio circuits. Adjustable cable length and lightweight handles. Ten minutes a day delivers real fitness results at a tiny price."
     },
     {
@@ -983,8 +983,8 @@
       "reviewCount": 10,
       "sold": 55,
       "tags": "gym,resistance bands,home workout,strength",
-      "shortDescription": "5-level resistance bands set — full-body training without weights.",
-      "description": "Five colour-coded bands from light to heavy cover every muscle group — presses, pulls, squats, and stretches. Pack them in a bag for training anywhere, home or travel. Perfect for beginners, physio work, and home workouts."
+      "shortDescription": "5-level resistance bands set, full-body training without weights.",
+      "description": "Five colour-coded bands from light to heavy cover every muscle group, presses, pulls, squats, and stretches. Pack them in a bag for training anywhere, home or travel. Perfect for beginners, physio work, and home workouts."
     },
     {
       "slug": "gym-gloves",
@@ -1002,7 +1002,7 @@
       "reviewCount": 9,
       "sold": 48,
       "tags": "gym,gloves,grip,protection,training",
-      "shortDescription": "FitPro gym gloves — protect your palms, keep your grip.",
+      "shortDescription": "FitPro gym gloves, protect your palms, keep your grip.",
       "description": "Padded palms and wrist support keep your grip firm through heavy sets and protect against calluses. A breathable back keeps hands from overheating in summer training. A small investment that makes every session better."
     },
     {
@@ -1021,7 +1021,7 @@
       "reviewCount": 12,
       "sold": 67,
       "tags": "gym,yoga,mat,tpe,exercise",
-      "shortDescription": "Non-slip TPE yoga mat — cushioned support for yoga and home workouts.",
+      "shortDescription": "Non-slip TPE yoga mat, cushioned support for yoga and home workouts.",
       "description": "This TPE mat gives firm, non-slip footing for yoga, stretching, and floor exercises, with enough cushioning to protect your knees and spine. Light, roll-up design with a carry strap. Free of the strong rubber smell common in cheap mats."
     },
     {
@@ -1040,8 +1040,8 @@
       "reviewCount": 6,
       "sold": 33,
       "tags": "gym,ab roller,core,fitness,home workout",
-      "shortDescription": "Ab roller wheel — build a stronger core with one simple tool.",
-      "description": "The ab roller is brutally effective — one smooth rolling motion works your entire core. A wide, stable wheel with comfortable grips and a knee-friendly design. Compact enough to store anywhere, cheap enough to try today."
+      "shortDescription": "Ab roller wheel, build a stronger core with one simple tool.",
+      "description": "The ab roller is brutally effective, one smooth rolling motion works your entire core. A wide, stable wheel with comfortable grips and a knee-friendly design. Compact enough to store anywhere, cheap enough to try today."
     }
   ],
   "brand": {

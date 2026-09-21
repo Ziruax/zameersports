@@ -81,7 +81,7 @@ async function fetchFeatured(): Promise<ProductsResponse> {
 }
 
 async function fetchTestimonials(): Promise<TestimonialDTO[]> {
-  // NOTE: Testimonial model has no createdAt column — no ordering applied.
+  // NOTE: Testimonial model has no createdAt column, so no ordering applied.
   return withRetry(
     () => db.testimonial.findMany({ where: { featured: true } }),
     { attempts: 3, label: "home:testimonials" },

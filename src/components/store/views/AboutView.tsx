@@ -35,22 +35,22 @@ const VALUES: { Icon: LucideIcon; title: string; text: string }[] = [
   {
     Icon: Trophy,
     title: "Cricket First",
-    text: "Cricket is our specialty — specialist bat knowledge, honest grades and proper knocking service before your bat ever leaves the shop.",
+    text: "Cricket is our specialty. Specialist bat knowledge, honest grades and proper knocking service before your bat ever leaves the shop.",
   },
   {
     Icon: Store,
     title: "One-Stop Centre",
-    text: "Every sport under one roof — cricket, football, volleyball, badminton, gym gear, trophies, gifts and toys. One trip, everything sorted.",
+    text: "Every sport under one roof: cricket, football, volleyball, badminton, gym gear, trophies, gifts and toys. One trip and everything is sorted.",
   },
   {
     Icon: Tags,
     title: "Honest Wholesale Pricing",
-    text: "Direct-importer rates on bats, balls and club orders — the same fair prices we give our local teams and schools.",
+    text: "Direct-importer rates on bats, balls and club orders, the same fair prices we give to our local teams and schools.",
   },
   {
     Icon: HeartHandshake,
     title: "Community Commitment",
-    text: "We sponsor tournaments, kit out school and club teams, and run the Zameer Sports Legends Cricket League — now in Season 5.",
+    text: "We sponsor tournaments, kit out school and club teams, and run the Zameer Sports Legends Cricket League, now in Season 5.",
   },
 ];
 
@@ -78,7 +78,7 @@ export default function AboutView() {
           </h1>
           <p className="mt-5 text-lg leading-relaxed text-neutral-600">
             Zameer Sports is a complete sports centre on Kolian Road, in Aslah Market at Board
-            Chowk, Dinga — cricket specialists serving Kharian, Gujrat and every corner of
+            Chowk, Dinga, cricket specialists serving Kharian, Gujrat and every corner of
             Pakistan. From the bat that fits your grip to the trophy for your tournament final, we
             stock it, we know it, and we stand behind it.
           </p>
@@ -113,7 +113,7 @@ export default function AboutView() {
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="space-y-4 leading-relaxed text-neutral-600">
             <p>
-              We grew up with tape-ball cricket in the streets of Dinga — and that love turned into
+              We grew up with tape-ball cricket in the streets of Dinga and that love turned into
               a full sports centre. Today we hand-pick Grade 1 English willow bats and ship them
               across the country. This is the home of the{" "}
               <strong className="text-neutral-900">Zameer Legend 2026</strong>, our own flagship
@@ -123,13 +123,13 @@ export default function AboutView() {
               But cricket is only the start. We keep a full range of footballs and official{" "}
               <strong className="text-neutral-900">Jagga volleyballs</strong> at wholesale rates,
               Yonex and Victor badminton gear, a gym corner, and a trophy counter with on-the-spot
-              engraving — plus gifts and toys for every occasion.
+              engraving, plus gifts and toys for every occasion.
             </p>
             <p>
               And we play as hard as we sell. The{" "}
               <strong className="text-neutral-900">Zameer Sports Legends Cricket League</strong> is
               now in Season 5 with the Champion Trophy 2026, we sponsor village volleyball
-              tournaments across the district, kit out school and club teams — and even export team
+              tournaments across the district, kit out school and club teams and even export team
               kits to customers in the UK.
             </p>
           </div>
@@ -142,7 +142,7 @@ export default function AboutView() {
                 {[
                   "Genuine branded stock, honestly graded",
                   "Free Pakistan-wide delivery on qualifying orders",
-                  "Cash on Delivery — pay when it arrives",
+                  "Cash on Delivery, pay when it arrives",
                   "Bat knocking, re-gripping and repair service",
                   "Wholesale rates for clubs, schools and tournaments",
                   "Trophy engraving and custom team kits",

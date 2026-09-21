@@ -42,7 +42,7 @@ function buildSpecs(p: (typeof catalog.products)[number]): Record<string, string
   const specs: Record<string, string> = { Brand: p.brand }
   if (CRICKET_BAT_SLUGS.has(p.slug)) {
     specs.Material = p.slug === "mb-malik-kashmir-willow" ? "Kashmir willow" : "English willow"
-    specs.Guarantee = "Hand-checked at our Dinga shop — genuine product guarantee"
+    specs.Guarantee = "Hand-checked at our Dinga shop, genuine product guarantee"
   } else {
     specs.Material = MATERIALS[p.categorySlug] ?? "Premium sports materials"
     specs.Guarantee = "Quality-checked before dispatch"
@@ -55,7 +55,7 @@ function buildSpecs(p: (typeof catalog.products)[number]): Record<string, string
 
 const SETTINGS: Record<string, string> = {
   store_name: "Zameer Sports",
-  store_tagline: "Dinga's Complete Sports Centre — Cricket Specialists",
+  store_tagline: "Dinga's Complete Sports Centre & Cricket Specialists",
   phone: "+92 310 7220870",
   whatsapp: "923465002049",
   email: "info@zameersports.shop",
@@ -104,13 +104,13 @@ const TESTIMONIALS = [
   {
     name: "Usman Ghani",
     location: "Dinga",
-    text: "They supplied the full sports kit for our school games — cricket gear, footballs and trophies. Very cooperative on pricing and delivery.",
+    text: "They supplied the full sports kit for our school games: cricket gear, footballs and trophies. Very cooperative on pricing and delivery.",
     rating: 5,
   },
   {
     name: "Hamza Tariq",
     location: "Dinga",
-    text: "Started gym recently — bought a skipping rope, resistance bands and gloves. Good quality and proper guidance for a beginner.",
+    text: "Started gym recently, bought a skipping rope, resistance bands and gloves. Good quality and proper guidance for a beginner.",
     rating: 4,
   },
 ]
@@ -148,7 +148,7 @@ const REVIEW_POOL: Record<string, { name: string; rating: number; comment: strin
     { name: "Bilal Ahmed", rating: 4, comment: "Good quality wheel bag for the price." },
   ],
   "football-match-size5": [
-    { name: "Bilal Hussain", rating: 5, comment: "Our club plays with these every weekend — holds air and shape well." },
+    { name: "Bilal Hussain", rating: 5, comment: "Our club plays with these every weekend, holds air and shape well." },
     { name: "Mubashar Hussain", rating: 4, comment: "Nice feel, true flight. Good for hard grounds." },
   ],
   "jagga-volleyball-super": [
@@ -156,7 +156,7 @@ const REVIEW_POOL: Record<string, { name: string; rating: number; comment: strin
     { name: "Waqar Younis", rating: 4, comment: "Good bounce and weight. Delivered fast to Dinga." },
   ],
   "jagga-volleyball-gold": [
-    { name: "Mian Asif", rating: 5, comment: "We ordered six balls for our club — all perfect. Wholesale rate was fair." },
+    { name: "Mian Asif", rating: 5, comment: "We ordered six balls for our club, all perfect. Wholesale rate was fair." },
     { name: "Sana Fatima", rating: 4, comment: "Durable ball, soft touch even in cold evenings." },
     { name: "Imran Sheikh", rating: 5, comment: "Best volleyball available in Gujrat district. Recommended." },
   ],
@@ -169,7 +169,7 @@ const REVIEW_POOL: Record<string, { name: string; rating: number; comment: strin
     { name: "Hira Shahid", rating: 4, comment: "Decent shuttlecocks for the price, will order again." },
   ],
   "gold-trophy-12": [
-    { name: "Usman Ghani", rating: 5, comment: "Ordered trophies for our school sports day — shiny and well packed." },
+    { name: "Usman Ghani", rating: 5, comment: "Ordered trophies for our school sports day, shiny and well packed." },
     { name: "Chaudhary Waseem", rating: 4, comment: "Good weight and finish. Delivery was on time." },
   ],
   "dumbbell-set-20kg": [
@@ -177,7 +177,7 @@ const REVIEW_POOL: Record<string, { name: string; rating: number; comment: strin
     { name: "Sohail Jutt", rating: 4, comment: "Good build, knurling grip is comfortable." },
   ],
   "kids-cricket-set": [
-    { name: "Ayesha Khan", rating: 5, comment: "Bought for my son's birthday — he loves it. Safe and complete set." },
+    { name: "Ayesha Khan", rating: 5, comment: "Bought for my son's birthday, he loves it. Safe and complete set." },
     { name: "Noor Fatima", rating: 4, comment: "Nice gift set, bat and stumps are lightweight for kids." },
   ],
 }
@@ -214,7 +214,7 @@ const DEMO_ORDERS: DemoOrderDef[] = [
   {
     number: "ZSDEMO004", name: "Atif Mahmood", phone: "03031234504", city: "Chak Jani",
     address: "Mian Volleyball Club, Chak Jani, Gujrat", status: "delivered", daysAgo: 21,
-    notes: "Club order — please include tournament discount",
+    notes: "Club order, please include tournament discount",
     items: [{ slug: "jagga-volleyball-gold", qty: 3 }],
   },
   {
@@ -256,7 +256,7 @@ const DEMO_ORDERS: DemoOrderDef[] = [
   {
     number: "ZSDEMO012", name: "Ayesha Khan", phone: "03111234512", city: "Islamabad",
     address: "Sector G-11, Islamabad", status: "cancelled", daysAgo: 12,
-    notes: "Cancelled by customer — ordered wrong size",
+    notes: "Cancelled by customer, ordered wrong size",
     paymentMethod: "bank",
     items: [{ slug: "kids-cricket-set", qty: 1 }],
   },
