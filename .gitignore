@@ -32,6 +32,16 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# internal notes / session artifacts (not part of the shipped codebase)
+worklog.md
+agent-ctx/
+tool-results/
+upload/
+db/
+.e2e-*/
+.zscripts/dev.pid
 
 # vercel
 .vercel
