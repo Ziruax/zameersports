@@ -11,7 +11,6 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import { cartCount, useCartStore } from "@/lib/cart-store";
 import { useHashRoute } from "@/hooks/use-hash-route";
@@ -136,17 +135,27 @@ export default function Header() {
           </Button>
 
           {/* Mobile menu */}
+          {/* Plain controlled trigger (no SheetTrigger): Radix generates its
+              dialog IDs via a useId shim that can mismatch between SSR and
+              hydration in React 19 dev mode. Deterministic ids avoid that. */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                aria-label="Open navigation menu"
-                className="size-11 rounded-full text-neutral-800 hover:bg-neutral-100 md:hidden"
-              >
-                <Menu className="size-5" aria-hidden="true" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[85%] gap-0 overflow-y-auto p-0 sm:max-w-xs">
+            <Button
+              type="button"
+              variant="ghost"
+              aria-label="Open navigation menu"
+              aria-haspopup="dialog"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav-sheet"
+              onClick={() => setMobileOpen(true)}
+              className="size-11 rounded-full text-neutral-800 hover:bg-neutral-100 md:hidden"
+            >
+              <Menu className="size-5" aria-hidden="true" />
+            </Button>
+            <SheetContent
+              id="mobile-nav-sheet"
+              side="right"
+              className="w-[85%] gap-0 overflow-y-auto p-0 sm:max-w-xs"
+            >
               <SheetHeader className="border-b p-4">
                 <SheetTitle className="font-display text-lg font-bold uppercase tracking-wide">
                   Zameer <span className="text-amber-500">Sports</span>

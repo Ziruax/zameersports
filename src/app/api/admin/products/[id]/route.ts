@@ -19,6 +19,33 @@ import { ProductUpdateSchema } from "../../_lib/schemas"
 type Params = { params: Promise<{ id: string }> }
 
 /**
+ * GET /api/admin/products/[id] — full product payload by id (admin only).
+ * Unlike the public product endpoint this also serves inactive products,
+ * which powers the edit dialog and the duplicate action. → { product }
+ */
+export async function GET(req: Request, { params }: Params) {
+  const admin = await requireAdmin(req)
+  if (!admin) return unauthorized()
+
+  const { id } = await params
+
+  try {
+    const product = await withRetry(
+      () =>
+        db.product.findUnique({
+          where: { id },
+          include: { category: { select: { id: true, name: true } } },
+        }),
+      { label: "admin:products:get" },
+    )
+    if (!product) return notFound("Product not found")
+    return NextResponse.json({ product: toAdminProductFull(product) })
+  } catch (err) {
+    return dbErrorResponse(err, "admin:products:get")
+  }
+}
+
+/**
  * PATCH /api/admin/products/[id] — partial update (all create fields optional).
  * Slug uniqueness is checked; comparePrice: null clears it. → { product }
  */

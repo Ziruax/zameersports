@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   AlertTriangle,
+  Copy,
   Link2,
   Loader2,
   Package,
@@ -60,19 +61,20 @@ import {
   PRODUCT_BADGES,
   type AdminCategory,
   type AdminProduct,
+  type AdminProductFull,
   type AdminProductInput,
   adminErrorMessage,
   uploadAdminImage,
   useAdminCategories,
   useAdminProductDelete,
   useAdminProductDetail,
+  useAdminProductDuplicate,
   useAdminProductSave,
   useAdminProducts,
   useDebouncedValue,
 } from "@/hooks/use-admin";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/format";
-import type { ProductDetail } from "@/lib/types";
 
 type ProductTarget = { mode: "create" } | { mode: "edit"; row: AdminProduct };
 
@@ -131,6 +133,15 @@ export default function ProductsManager() {
   const products = useAdminProducts({ search: debouncedSearch, category, page });
   const categories = useAdminCategories();
   const del = useAdminProductDelete();
+  const duplicate = useAdminProductDuplicate();
+
+  function handleDuplicate(product: AdminProduct) {
+    duplicate.mutate(product.id, {
+      onSuccess: (res) =>
+        toast.success(`Duplicated as "${res.product.name}" (hidden draft)`),
+      onError: (err) => toast.error(adminErrorMessage(err)),
+    });
+  }
 
   function handleDelete(product: AdminProduct) {
     setDeleting(null);
@@ -312,6 +323,16 @@ export default function ProductsManager() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          className="size-8 text-neutral-500 hover:text-emerald-700"
+                          onClick={() => handleDuplicate(p)}
+                          disabled={duplicate.isPending}
+                          aria-label={`Duplicate ${p.name}`}
+                        >
+                          <Copy className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="size-8 text-neutral-500 hover:text-red-600"
                           onClick={() => setDeleting(p)}
                           aria-label={`Delete ${p.name}`}
@@ -374,7 +395,7 @@ export default function ProductsManager() {
 
 function buildInitial(
   row: AdminProduct,
-  detail?: ProductDetail,
+  detail?: AdminProductFull,
   detailFailed = false,
 ): ProductFormState {
   return {
@@ -408,7 +429,7 @@ function ProductDialog({
 }) {
   const isEdit = target.mode === "edit";
   const row = isEdit ? target.row : null;
-  const detail = useAdminProductDetail(isEdit ? (row?.slug ?? null) : null);
+  const detail = useAdminProductDetail(isEdit ? (row?.id ?? null) : null);
 
   let body: React.ReactNode;
   if (isEdit && row && detail.isPending) {
@@ -551,7 +572,8 @@ function ProductForm({
       price: Math.round(Number(price)),
       stock: Math.round(Number(stock)),
       comparePrice: comparePrice.trim() ? Math.round(Number(comparePrice)) : null,
-      badge,
+      // "none" is the dropdown's empty choice — the API expects "" for no badge.
+      badge: badge === "none" ? "" : badge,
       featured,
       isNew,
       active,

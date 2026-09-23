@@ -7,6 +7,7 @@ import {
   Banknote,
   MessageCircle,
   Minus,
+  Package,
   PackageSearch,
   Plus,
   ShieldCheck,
@@ -257,14 +258,26 @@ export default function ProductView({ slug }: { slug: string }) {
         {/* Gallery */}
         <Card className="gap-0 overflow-hidden rounded-2xl p-2 py-2">
           <div className="relative aspect-square overflow-hidden rounded-xl bg-neutral-100">
-            <Image
-              src={product.images[selectedImage] ?? product.image}
-              alt={product.name}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-            />
+            {product.images[selectedImage] ?? product.image ? (
+              <Image
+                src={product.images[selectedImage] ?? product.image}
+                alt={product.name}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            ) : (
+              <div
+                className="flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-100 text-neutral-300"
+                aria-hidden="true"
+              >
+                <Package className="size-16" />
+                <span className="text-[10px] font-semibold uppercase tracking-widest">
+                  Photo coming soon
+                </span>
+              </div>
+            )}
             {product.badge ? (
               <span
                 className={cn(

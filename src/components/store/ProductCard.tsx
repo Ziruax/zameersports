@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, Package, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -49,13 +49,25 @@ export default function ProductCard({ product }: { product: ProductListItem }) {
   return (
     <Card className="group relative gap-0 overflow-hidden rounded-xl p-0 py-0 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
       <div className="relative aspect-square overflow-hidden bg-neutral-100">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div
+            className="flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-100 text-neutral-300"
+            aria-hidden="true"
+          >
+            <Package className="size-12" />
+            <span className="text-[10px] font-semibold uppercase tracking-widest">
+              Photo coming soon
+            </span>
+          </div>
+        )}
         {product.badge ? (
           <span
             className={cn(

@@ -531,13 +531,22 @@ export default function HomeView({ initialData }: { initialData: StoreInitialDat
                   aria-label={`Shop ${cat.name}`}
                 >
                   <div className="relative aspect-[4/3] bg-neutral-100">
-                    <Image
-                      src={cat.image}
-                      alt={cat.name}
-                      fill
-                      sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
+                    {cat.image ? (
+                      <Image
+                        src={cat.image}
+                        alt={cat.name}
+                        fill
+                        sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div
+                        className="flex h-full w-full items-center justify-center bg-emerald-50 text-emerald-300"
+                        aria-hidden="true"
+                      >
+                        <Icon className="size-12" />
+                      </div>
+                    )}
                     <div
                       aria-hidden="true"
                       className="absolute inset-0 bg-gradient-to-t from-neutral-950/75 via-neutral-950/20 to-transparent"

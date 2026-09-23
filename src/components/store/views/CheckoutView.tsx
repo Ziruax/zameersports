@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import Image from "next/image";
+import ProductThumb from "../ProductThumb";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Banknote, Landmark, Loader2, MessageCircle, ShieldCheck, ShoppingBag, TicketPercent } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
@@ -471,15 +471,12 @@ export default function CheckoutView() {
               <ul className="max-h-72 space-y-3 overflow-y-auto scrollbar-slim pr-1" aria-label="Order items">
                 {items.map((item) => (
                   <li key={item.productId} className="flex items-center gap-3">
-                    <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        sizes="48px"
-                        className="object-cover"
-                      />
-                    </div>
+                    <ProductThumb
+                      src={item.image}
+                      alt={item.name}
+                      sizes="48px"
+                      className="size-12 rounded-lg"
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-neutral-900">{item.name}</p>
                       <p className="text-sm text-neutral-500">

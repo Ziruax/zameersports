@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/image";
+import ProductThumb from "../ProductThumb";
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import {
   AlertDialog,
@@ -76,15 +76,12 @@ function CartRow({
   const maxQty = Math.max(1, Math.min(item.stock || 10, 10));
   return (
     <li className="flex gap-3 p-4 sm:gap-4 sm:p-5">
-      <div className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-neutral-100 sm:size-24">
-        <Image
-          src={item.image}
-          alt={item.name}
-          fill
-          sizes="96px"
-          className="object-cover"
-        />
-      </div>
+      <ProductThumb
+        src={item.image}
+        alt={item.name}
+        sizes="96px"
+        className="size-20 rounded-lg sm:size-24"
+      />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">

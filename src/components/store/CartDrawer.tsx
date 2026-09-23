@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import ProductThumb from "./ProductThumb";
 import { Minus, Plus, ShoppingBag, ShoppingCart, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -74,15 +74,12 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
               <ul className="flex flex-col gap-4">
                 {items.map((item) => (
                   <li key={item.productId} className="flex gap-3">
-                    <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        sizes="64px"
-                        className="object-cover"
-                      />
-                    </div>
+                    <ProductThumb
+                      src={item.image}
+                      alt={item.name}
+                      sizes="64px"
+                      className="size-16 rounded-lg"
+                    />
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <a
                         href={`#/product/${item.slug}`}

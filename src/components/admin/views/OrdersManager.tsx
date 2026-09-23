@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  Download,
   Eye,
   Loader2,
   MessageCircle,
@@ -41,12 +42,14 @@ import { EmptyState, ErrorState, TablePagination, TableSkeleton, waHref } from "
 import {
   ORDER_STATUSES,
   type AdminOrder,
+  type AdminOrdersResponse,
   type OrderStatus,
   adminErrorMessage,
   useAdminOrderStatus,
   useAdminOrders,
   useDebouncedValue,
 } from "@/hooks/use-admin";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { formatDate, formatPrice } from "@/lib/format";
 
@@ -57,8 +60,93 @@ export default function OrdersManager() {
   const debouncedSearch = useDebouncedValue(search, 400);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<AdminOrder | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const orders = useAdminOrders({ status, search: debouncedSearch, page });
+
+  /** Fetch every order matching the current filters (100 per page) and download as CSV. */
+  async function exportCsv() {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const all: AdminOrder[] = [];
+      let p = 1;
+      for (;;) {
+        const qs = new URLSearchParams({ page: String(p), limit: "100" });
+        if (status !== "all") qs.set("status", status);
+        if (debouncedSearch) qs.set("search", debouncedSearch);
+        const res = await api<AdminOrdersResponse>(`/api/admin/orders?${qs.toString()}`);
+        all.push(...res.items);
+        if (p >= res.pages || res.items.length === 0) break;
+        p += 1;
+      }
+      if (all.length === 0) {
+        toast.info("No orders to export for the current filters.");
+        return;
+      }
+      const esc = (v: string | number | null) => {
+        const s = String(v ?? "").replace(/"/g, '""');
+        return /[",\n\r]/.test(s) ? `"${s}"` : s;
+      };
+      const header = [
+        "Order #",
+        "Date",
+        "Customer",
+        "Phone",
+        "City",
+        "Address",
+        "Items",
+        "Subtotal",
+        "Discount",
+        "Coupon",
+        "Shipping",
+        "Total",
+        "Payment",
+        "Status",
+        "Notes",
+      ];
+      const lines = [header.join(",")];
+      for (const o of all) {
+        lines.push(
+          [
+            o.orderNumber,
+            o.createdAt,
+            o.customerName,
+            o.phone,
+            o.city,
+            o.address,
+            o.items.map((i) => `${i.name} x${i.qty}`).join("; "),
+            o.subtotal,
+            o.discount,
+            o.couponCode,
+            o.shipping,
+            o.total,
+            o.paymentMethod,
+            o.status,
+            o.notes,
+          ]
+            .map(esc)
+            .join(","),
+        );
+      }
+      const blob = new Blob([`\uFEFF${lines.join("\n")}`], {
+        type: "text/csv;charset=utf-8",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `zameer-sports-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success(`Exported ${all.length} order${all.length === 1 ? "" : "s"} to CSV`);
+    } catch (err) {
+      toast.error(adminErrorMessage(err));
+    } finally {
+      setExporting(false);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -106,6 +194,18 @@ export default function OrdersManager() {
         >
           <RefreshCw className={cn(orders.isFetching && "animate-spin")} aria-hidden="true" />
           Refresh
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => void exportCsv()}
+          disabled={exporting}
+        >
+          {exporting ? (
+            <Loader2 className="animate-spin" aria-hidden="true" />
+          ) : (
+            <Download aria-hidden="true" />
+          )}
+          Export CSV
         </Button>
       </div>
 

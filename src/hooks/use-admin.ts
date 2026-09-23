@@ -13,7 +13,6 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { api, ApiError } from "@/lib/api";
-import type { ProductDetail } from "@/lib/types";
 
 /* ---------------------------------- DTOs ---------------------------------- */
 
@@ -33,7 +32,6 @@ export interface AdminStats {
   pendingCount: number;
   lowStockCount: number;
   subscribersCount: number;
-  salesByDay: { date: string; orders: number; total: number }[];
   statusCounts: {
     pending: number;
     confirmed: number;
@@ -311,16 +309,59 @@ export function useAdminProducts(params: AdminProductsParams = {}) {
 }
 
 /**
- * Full product detail for the edit dialog. Served by the public product API
- * (the admin API has no GET by id); inactive products 404 there, so callers
- * must handle the error state.
+ * Full product detail for the edit dialog, fetched by id from the admin API
+ * (works for inactive products too, unlike the public product endpoint).
  */
-export function useAdminProductDetail(slug: string | null) {
+export function useAdminProductDetail(id: string | null) {
   return useQuery({
-    queryKey: ["admin", "product", slug],
-    queryFn: () => api<ProductDetail>(`/api/products/${slug ?? ""}`),
-    enabled: Boolean(slug),
+    queryKey: ["admin", "product", id],
+    queryFn: async () =>
+      (await api<{ product: AdminProductFull }>(`/api/admin/products/${id ?? ""}`))
+        .product,
+    enabled: Boolean(id),
     staleTime: 5 * 60_000,
+  });
+}
+
+/**
+ * Duplicate a product: fetches the full record by id, then creates a copy
+ * named "… (Copy)" as a hidden draft (active: false) with a fresh auto slug,
+ * so the owner can review it before it goes live in the shop.
+ */
+export function useAdminProductDuplicate() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const source = (
+        await api<{ product: AdminProductFull }>(`/api/admin/products/${id}`)
+      ).product;
+      const data: AdminProductInput = {
+        name: `${source.name} (Copy)`.slice(0, 120),
+        brand: source.brand,
+        categoryId: source.categoryId,
+        price: source.price,
+        comparePrice: source.comparePrice,
+        stock: source.stock,
+        badge: source.badge,
+        description: source.description,
+        images: source.images,
+        tags: source.tags,
+        specs: source.specs,
+        metaTitle: source.metaTitle,
+        metaDescription: source.metaDescription,
+        featured: false,
+        isNew: false,
+        active: false,
+      };
+      return api<{ product: AdminProductFull }>("/api/admin/products", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "products"] });
+      void qc.invalidateQueries({ queryKey: ["admin", "stats"] });
+    },
   });
 }
 
