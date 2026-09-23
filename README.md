@@ -90,11 +90,25 @@ Open <http://localhost:3000>. The store loads at `/` and the admin panel at `/#/
 | Command                    | What it does                            |
 | -------------------------- | --------------------------------------- |
 | `bun run dev`              | Start the Next.js dev server            |
+| `bun run build`            | Prisma generate + production build      |
+| `bun run start`            | Run the standalone production server    |
 | `bun run lint`             | Run ESLint                              |
 | `bun run db:push`          | Push Prisma schema to MySQL             |
 | `bun run db:generate`      | Regenerate the Prisma client            |
 | `bun scripts/seed.ts`      | Idempotent seed (safe to re-run)        |
 | `bun scripts/db-counts.ts` | Print live row counts for sanity checks |
+
+## Production Deploy (Hostinger Node.js hosting)
+
+The `build` script already runs `prisma generate` before `next build`, and `postinstall` regenerates the client after every dependency install, so a clean server without a global Prisma CLI works out of the box:
+
+```bash
+npm install          # postinstall runs "prisma generate" automatically
+npm run build        # prisma generate && next build (standalone output)
+npm run start        # serves .next/standalone/server.js on port 3000
+```
+
+Set `DATABASE_URL` in the server's `.env` (same `mysql://` string as local). Uploaded product images are stored in `public/uploads/`, which is created automatically at runtime.
 
 ## Project Structure
 

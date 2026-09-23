@@ -62,3 +62,7 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# runtime-uploaded images (admin uploads) — keep only the placeholder
+public/uploads/*
+!public/uploads/.gitkeep

@@ -74,7 +74,7 @@ export default function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
                   id="admin-email"
                   type="email"
                   autoComplete="email"
-                  placeholder="admin@zameersports.shop"
+                  placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="h-11"
@@ -113,9 +113,6 @@ export default function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
               </Button>
             </form>
 
-            <p className="rounded-md bg-neutral-100 px-3 py-2 text-center text-xs text-neutral-500">
-              Demo: admin@zameersports.shop / Zameer@2025
-            </p>
           </CardContent>
         </Card>
       </div>
