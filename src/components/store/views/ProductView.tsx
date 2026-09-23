@@ -82,8 +82,42 @@ export default function ProductView({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (product) {
-      document.title = `${product.name} | Buy Online at Zameer Sports`;
+      document.title = product.metaTitle
+        ? `${product.metaTitle} | Zameer Sports`
+        : `${product.name} | Buy Online at Zameer Sports`;
     }
+  }, [product]);
+
+  /* Per-product meta description + OG tags. Uses the admin-editable
+   * metaDescription when set, else the first 155 characters of the product
+   * description. Restored to the site default on unmount. */
+  useEffect(() => {
+    if (!product) return;
+    const description = (
+      product.metaDescription || product.description
+    ).replace(/\s+/g, " ").trim().slice(0, 155);
+    const upsert = (selector: string, attrs: Record<string, string>) => {
+      let el = document.head.querySelector<HTMLMetaElement>(selector);
+      if (!el) {
+        el = document.createElement("meta");
+        for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", description);
+      return el;
+    };
+    const metaDesc = upsert('meta[name="description"]', { name: "description" });
+    const ogDesc = upsert('meta[property="og:description"]', { property: "og:description" });
+    return () => {
+      metaDesc.setAttribute(
+        "content",
+        "Zameer Sports Dinga is a trusted cricket shop in Pakistan. Buy original cricket bats, footballs, volleyballs, badminton rackets, trophies, gifts, toys and gym gear online with Cash on Delivery.",
+      );
+      ogDesc.setAttribute(
+        "content",
+        "Original cricket bats, footballs, volleyballs, badminton rackets, trophies, gifts, toys and gym gear. Pakistan-wide delivery and Cash on Delivery from Dinga, Gujrat.",
+      );
+    };
   }, [product]);
 
   /* Product structured data (JSON-LD). Injected client-side because product

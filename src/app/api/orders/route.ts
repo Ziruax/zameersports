@@ -4,6 +4,7 @@ import { db } from "@/lib/db"
 import { cacheInvalidate } from "@/lib/cache"
 import { getSettings, getShippingInfo } from "@/lib/settings"
 import { withRetry } from "@/lib/retry"
+import { checkCoupon } from "@/lib/coupon"
 import { dbErrorResponse, firstImage } from "../_lib/helpers"
 
 const PHONE_RE = /^[0-9+\-\s]{10,15}$/
@@ -21,6 +22,7 @@ const OrderSchema = z.object({
   city: z.string().trim().min(2, "City must be at least 2 characters").max(60),
   notes: z.string().trim().max(500).optional(),
   items: z.array(OrderItemSchema).min(1, "Order must contain at least 1 item").max(20),
+  couponCode: z.string().trim().max(30).optional(),
 })
 
 /**
@@ -88,38 +90,69 @@ export async function POST(req: Request) {
     const { threshold, fee } = getShippingInfo(settings)
     const subtotal = lineItems.reduce((s, i) => s + i.price * i.qty, 0)
     const shipping = subtotal >= threshold ? 0 : fee
-    const total = subtotal + shipping
+
+    /* coupon (server-side re-validation, authoritative) */
+    let discount = 0
+    let couponCode = ""
+    let couponId: string | null = null
+    if (parsed.data.couponCode) {
+      const check = await checkCoupon(parsed.data.couponCode, subtotal)
+      if (!check.ok || !check.coupon) {
+        return Response.json(
+          { error: `Coupon "${parsed.data.couponCode.trim().toUpperCase()}" could not be applied. Please remove it and try again.` },
+          { status: 400 },
+        )
+      }
+      discount = check.discount ?? 0
+      couponCode = check.coupon.code
+      couponId = check.coupon.id
+    }
+    const total = Math.max(0, subtotal - discount) + shipping
 
     const orderNumber = "ZS" + Date.now().toString(36).toUpperCase() + Math.floor(10 + Math.random() * 90)
 
     try {
       await withRetry(
         () =>
-          db.$transaction(async (tx) => {
-            await tx.order.create({
-              data: {
-                orderNumber,
-                customerName,
-                phone,
-                email,
-                address,
-                city,
-                notes,
-                subtotal,
-                shipping,
-                total,
-                paymentMethod: "cod",
-                status: "pending",
-                items: { create: lineItems },
-              },
-            })
-            for (const [id, qty] of qtyById) {
-              await tx.product.updateMany({
-                where: { id },
-                data: { stock: { decrement: qty }, sold: { increment: qty } },
+          db.$transaction(
+            async (tx) => {
+              await tx.order.create({
+                data: {
+                  orderNumber,
+                  customerName,
+                  phone,
+                  email,
+                  address,
+                  city,
+                  notes,
+                  subtotal,
+                  discount,
+                  couponCode,
+                  shipping,
+                  total,
+                  paymentMethod: "cod",
+                  status: "pending",
+                  items: { create: lineItems },
+                },
               })
-            }
-          }),
+              for (const [id, qty] of qtyById) {
+                await tx.product.updateMany({
+                  where: { id },
+                  data: { stock: { decrement: qty }, sold: { increment: qty } },
+                })
+              }
+              if (couponId) {
+                await tx.coupon.update({
+                  where: { id: couponId },
+                  data: { usedCount: { increment: 1 } },
+                })
+              }
+            },
+            /* Remote shared-hosting MySQL is slow; the default 5s interactive
+             * timeout expires mid-commit and surfaces as "Transaction already
+             * closed". 30s headroom keeps the atomic order write reliable. */
+            { timeout: 30_000, maxWait: 15_000 },
+          ),
         { label: "orders:create" },
       )
     } catch (txErr) {
@@ -131,13 +164,13 @@ export async function POST(req: Request) {
           () =>
             db.order.findUnique({
               where: { orderNumber },
-              select: { orderNumber: true, subtotal: true, shipping: true, total: true },
+              select: { orderNumber: true, subtotal: true, discount: true, shipping: true, total: true },
             }),
           { label: "orders:find-existing" },
         )
         if (existing) {
           return Response.json(
-            { orderNumber: existing.orderNumber, subtotal: existing.subtotal, shipping: existing.shipping, total: existing.total },
+            { orderNumber: existing.orderNumber, subtotal: existing.subtotal, discount: existing.discount, shipping: existing.shipping, total: existing.total },
             { status: 201 },
           )
         }
@@ -146,7 +179,7 @@ export async function POST(req: Request) {
     }
 
     cacheInvalidate("products")
-    return Response.json({ orderNumber, subtotal, shipping, total }, { status: 201 })
+    return Response.json({ orderNumber, subtotal, discount, shipping, total }, { status: 201 })
   } catch (err) {
     return dbErrorResponse(err, "orders:create")
   }

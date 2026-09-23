@@ -38,6 +38,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
       specs: parseSpecs(product.specs),
       tags: parseTags(product.tags),
       featured: product.featured,
+      metaTitle: product.metaTitle,
+      metaDescription: product.metaDescription,
       categoryName: product.category.name,
       categorySlug: product.category.slug,
       related: relatedRows.map(toListItem),

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Menu, Package, Search, ShoppingCart } from "lucide-react";
+import { Heart, Menu, Package, Search, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -112,6 +112,13 @@ export default function Header() {
           >
             <Package className="size-4" aria-hidden="true" />
             Track Order
+          </a>
+          <a
+            href="#/wishlist"
+            aria-label="Open your wishlist"
+            className="flex size-11 items-center justify-center rounded-full text-neutral-800 transition-colors hover:bg-neutral-100 hover:text-emerald-700"
+          >
+            <Heart className="size-5" aria-hidden="true" />
           </a>
           <Button
             type="button"

@@ -29,6 +29,8 @@ export const ProductCreateSchema = z.object({
   active: z.boolean().optional(),
   tags: z.array(z.string().trim().min(1)).max(20).optional(),
   specs: z.record(z.string().min(1), z.string()).optional(),
+  metaTitle: z.string().trim().max(150, "Meta title is too long (max 150)").optional(),
+  metaDescription: z.string().trim().max(320, "Meta description is too long (max 320)").optional(),
 })
 
 /** PATCH payload: every create field is optional (comparePrice also accepts null to clear). */

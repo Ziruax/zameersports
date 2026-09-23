@@ -12,6 +12,7 @@ export type RouteName =
   | "track"
   | "about"
   | "contact"
+  | "wishlist"
   | "admin";
 
 export interface HashRoute {
@@ -30,6 +31,7 @@ const ROUTE_NAMES: RouteName[] = [
   "track",
   "about",
   "contact",
+  "wishlist",
   "admin",
 ];
 

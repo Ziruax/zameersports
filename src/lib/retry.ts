@@ -6,7 +6,7 @@ export function isTransientDbError(err: unknown): boolean {
   if (err instanceof Prisma.PrismaClientKnownRequestError && TRANSIENT_CODES.includes(err.code)) return true
   if (err instanceof Prisma.PrismaClientInitializationError) return true
   const msg = err instanceof Error ? err.message : String(err)
-  const transient = ["Can't reach database server", 'Connection terminated', 'Connection closed', 'Timeout', 'timed out', 'ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'socket hang up', 'Error querying the database']
+  const transient = ["Can't reach database server", 'Connection terminated', 'Connection closed', 'Timeout', 'timeout', 'timed out', 'ECONNRESET', 'ETIMEDOUT', 'ECONNREFUSED', 'socket hang up', 'Error querying the database', 'Transaction already closed', 'expired transaction']
   return transient.some((m) => msg.includes(m))
 }
 

@@ -206,6 +206,14 @@ function OrderCard({ order }: { order: TrackedOrder }) {
             <span className="text-neutral-500">Subtotal</span>
             <span className="font-medium text-neutral-900">{formatPrice(order.subtotal)}</span>
           </div>
+          {order.discount > 0 ? (
+            <div className="flex items-center justify-between">
+              <span className="text-neutral-500">
+                Coupon{order.couponCode ? ` (${order.couponCode})` : ""}
+              </span>
+              <span className="font-bold text-emerald-700">&minus;{formatPrice(order.discount)}</span>
+            </div>
+          ) : null}
           <div className="flex items-center justify-between">
             <span className="text-neutral-500">Shipping</span>
             {order.shipping === 0 ? (

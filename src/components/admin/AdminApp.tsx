@@ -13,6 +13,7 @@ import {
   Package,
   Settings as SettingsIcon,
   Star,
+  TicketPercent,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -31,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { ErrorState } from "./shared";
 import AdminLogin from "./views/AdminLogin";
 import CategoriesManager from "./views/CategoriesManager";
+import CouponsManager from "./views/CouponsManager";
 import DashboardHome from "./views/DashboardHome";
 import MessagesInbox from "./views/MessagesInbox";
 import OrdersManager from "./views/OrdersManager";
@@ -44,6 +46,7 @@ type Section =
   | "orders"
   | "products"
   | "categories"
+  | "coupons"
   | "reviews"
   | "messages"
   | "subscribers"
@@ -54,6 +57,7 @@ const SECTION_TITLES: Record<Section, string> = {
   orders: "Orders",
   products: "Products",
   categories: "Categories",
+  coupons: "Coupons",
   reviews: "Reviews",
   messages: "Messages",
   subscribers: "Subscribers",
@@ -137,6 +141,7 @@ function AdminShell({
     { key: "orders", label: "Orders", icon: Package, badge: pendingCount },
     { key: "products", label: "Products", icon: Boxes },
     { key: "categories", label: "Categories", icon: FolderTree },
+    { key: "coupons", label: "Coupons", icon: TicketPercent },
     { key: "reviews", label: "Reviews", icon: Star },
     { key: "messages", label: "Messages", icon: Mail, badge: unreadCount },
     { key: "subscribers", label: "Subscribers", icon: Users },
@@ -283,6 +288,7 @@ function AdminShell({
             {section === "orders" ? <OrdersManager /> : null}
             {section === "products" ? <ProductsManager /> : null}
             {section === "categories" ? <CategoriesManager /> : null}
+            {section === "coupons" ? <CouponsManager /> : null}
             {section === "reviews" ? <ReviewsManager /> : null}
             {section === "messages" ? <MessagesInbox /> : null}
             {section === "subscribers" ? <SubscribersList /> : null}

@@ -36,6 +36,8 @@ export interface ProductDetail extends ProductListItem {
   specs: Record<string, string>
   tags: string[]
   featured: boolean
+  metaTitle: string
+  metaDescription: string
   categoryName: string
   categorySlug: string
   related: ProductListItem[]
@@ -81,6 +83,8 @@ export interface OrderDTO {
   city: string
   notes: string
   subtotal: number
+  discount: number
+  couponCode: string
   shipping: number
   total: number
   paymentMethod: string

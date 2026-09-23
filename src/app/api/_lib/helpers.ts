@@ -112,6 +112,8 @@ export function toOrderDTO(o: Order & { items: OrderItem[] }): OrderDTO & { upda
     city: o.city,
     notes: o.notes,
     subtotal: o.subtotal,
+    discount: o.discount,
+    couponCode: o.couponCode,
     shipping: o.shipping,
     total: o.total,
     paymentMethod: o.paymentMethod,

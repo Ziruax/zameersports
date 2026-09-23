@@ -122,6 +122,8 @@ export interface AdminOrder {
   city: string;
   notes: string;
   subtotal: number;
+  discount: number;
+  couponCode: string;
   shipping: number;
   total: number;
   paymentMethod: string;
@@ -183,6 +185,8 @@ export type AdminProductInput = {
   active?: boolean;
   tags?: string[];
   specs?: Record<string, string>;
+  metaTitle?: string;
+  metaDescription?: string;
 };
 
 export type AdminCategoryInput = {
@@ -396,6 +400,69 @@ export function useAdminCategoryDelete() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["admin", "categories"] });
       void qc.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+}
+
+/* --------------------------------- Coupons --------------------------------- */
+
+export interface AdminCoupon {
+  id: string;
+  code: string;
+  type: "percent" | "fixed";
+  value: number;
+  minOrder: number;
+  active: boolean;
+  usageLimit: number;
+  usedCount: number;
+  expiresAt: string | null;
+  createdAt: string;
+}
+
+export interface AdminCouponInput {
+  code: string;
+  type: "percent" | "fixed";
+  value: number;
+  minOrder: number;
+  usageLimit: number;
+  expiresAt?: string;
+  active: boolean;
+}
+
+export function useAdminCoupons() {
+  return useQuery({
+    queryKey: ["admin", "coupons"],
+    queryFn: async () =>
+      (await api<{ items: AdminCoupon[] }>("/api/admin/coupons")).items,
+  });
+}
+
+export function useAdminCouponSave() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id?: string; data: Partial<AdminCouponInput> }) =>
+      id
+        ? api<{ coupon: AdminCoupon }>(`/api/admin/coupons/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify(data),
+          })
+        : api<{ coupon: AdminCoupon }>("/api/admin/coupons", {
+            method: "POST",
+            body: JSON.stringify(data),
+          }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "coupons"] });
+    },
+  });
+}
+
+export function useAdminCouponDelete() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api<{ ok: boolean }>(`/api/admin/coupons/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin", "coupons"] });
     },
   });
 }

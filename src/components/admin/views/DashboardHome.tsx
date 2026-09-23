@@ -10,18 +10,6 @@ import {
   ShoppingCart,
   TrendingUp,
 } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -36,18 +24,10 @@ import {
 import StatCard from "@/components/admin/StatCard";
 import StatusBadge from "@/components/admin/StatusBadge";
 import { ErrorState } from "@/components/admin/shared";
-import { ORDER_STATUSES, useAdminStats } from "@/hooks/use-admin";
+import { useAdminStats } from "@/hooks/use-admin";
 import { formatDate, formatPrice } from "@/lib/format";
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: "#f59e0b",
-  confirmed: "#059669",
-  shipped: "#f97316",
-  delivered: "#065f46",
-  cancelled: "#a3a3a3",
-};
-
-/** Admin dashboard: KPIs, sales chart, status donut, recent orders, low stock. */
+/** Admin dashboard: KPI cards, recent orders, low stock. */
 export default function DashboardHome({ onGoOrders }: { onGoOrders: () => void }) {
   const stats = useAdminStats();
 
@@ -58,10 +38,6 @@ export default function DashboardHome({ onGoOrders }: { onGoOrders: () => void }
           {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-[76px] rounded-xl" />
           ))}
-        </div>
-        <div className="grid gap-4 lg:grid-cols-3">
-          <Skeleton className="h-80 rounded-xl lg:col-span-2" />
-          <Skeleton className="h-80 rounded-xl" />
         </div>
         <div className="grid gap-4 lg:grid-cols-3">
           <Skeleton className="h-72 rounded-xl lg:col-span-2" />
@@ -82,21 +58,6 @@ export default function DashboardHome({ onGoOrders }: { onGoOrders: () => void }
   }
 
   const d = stats.data;
-
-  const chartData = d.salesByDay.map((point) => {
-    const [y, m, day] = point.date.split("-").map(Number);
-    const date = new Date(y ?? 0, (m ?? 1) - 1, day ?? 1);
-    return {
-      ...point,
-      label: date.toLocaleDateString("en-PK", { month: "short", day: "numeric" }),
-    };
-  });
-
-  const pieData = ORDER_STATUSES.map((s) => ({
-    key: s,
-    name: s.charAt(0).toUpperCase() + s.slice(1),
-    value: d.statusCounts[s],
-  })).filter((slice) => slice.value > 0);
 
   return (
     <div className="space-y-4">
@@ -137,110 +98,6 @@ export default function DashboardHome({ onGoOrders }: { onGoOrders: () => void }
           tone={d.lowStockCount > 0 ? "red" : "emerald"}
           hint="Stock below 5"
         />
-      </div>
-
-      {/* Charts row */}
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="rounded-xl lg:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-neutral-700">
-              Sales &mdash; Last 30 Days
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 5, right: 8, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="adminSalesFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#059669" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#059669" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" vertical={false} />
-                <XAxis
-                  dataKey="label"
-                  tick={{ fontSize: 11, fill: "#737373" }}
-                  tickLine={false}
-                  axisLine={{ stroke: "#e5e5e5" }}
-                  minTickGap={24}
-                />
-                <YAxis
-                  tick={{ fontSize: 11, fill: "#737373" }}
-                  tickLine={false}
-                  axisLine={false}
-                  width={44}
-                  tickFormatter={(v: number) => (v >= 1000 ? `${Math.round(v / 1000)}k` : String(v))}
-                />
-                <Tooltip
-                  formatter={(value: number | string) => formatPrice(Number(value))}
-                  contentStyle={{
-                    borderRadius: 8,
-                    border: "1px solid #e5e5e5",
-                    fontSize: 12,
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="total"
-                  stroke="#059669"
-                  strokeWidth={2}
-                  fill="url(#adminSalesFill)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-xl">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-semibold text-neutral-700">
-              Orders by Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-40">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={40}
-                    outerRadius={64}
-                    paddingAngle={2}
-                    strokeWidth={0}
-                  >
-                    {pieData.map((slice) => (
-                      <Cell key={slice.key} fill={STATUS_COLORS[slice.key]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: 8,
-                      border: "1px solid #e5e5e5",
-                      fontSize: 12,
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <ul className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1.5">
-              {ORDER_STATUSES.map((s) => (
-                <li key={s} className="flex items-center gap-2 text-xs text-neutral-600">
-                  <span
-                    className="size-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: STATUS_COLORS[s] }}
-                    aria-hidden="true"
-                  />
-                  <span className="capitalize">{s}</span>
-                  <span className="ml-auto font-semibold text-neutral-800">
-                    {d.statusCounts[s]}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Recent orders + low stock */}

@@ -336,6 +336,14 @@ function OrderDialog({
               <span>Subtotal</span>
               <span>{formatPrice(order.subtotal)}</span>
             </div>
+            {order.discount > 0 ? (
+              <div className="flex justify-between font-semibold text-emerald-700">
+                <span>
+                  Coupon{order.couponCode ? ` (${order.couponCode})` : ""}
+                </span>
+                <span>&minus;{formatPrice(order.discount)}</span>
+              </div>
+            ) : null}
             <div className="flex justify-between text-neutral-600">
               <span>Shipping</span>
               <span>{order.shipping === 0 ? "FREE" : formatPrice(order.shipping)}</span>

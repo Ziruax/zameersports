@@ -43,6 +43,8 @@ model Product {
   specs        String      @default("{}") @db.Text
   sold         Int         @default(0)
   active       Boolean     @default(true)
+  metaTitle       String   @default("")
+  metaDescription String   @default("") @db.Text
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   reviews      Review[]
@@ -63,6 +65,8 @@ model Order {
   city          String
   notes         String      @default("") @db.Text
   subtotal      Int
+  discount      Int         @default(0)
+  couponCode    String      @default("")
   shipping      Int         @default(0)
   total         Int
   paymentMethod String      @default("cod")
@@ -73,6 +77,21 @@ model Order {
 
   @@index([status])
   @@index([phone])
+}
+
+model Coupon {
+  id         String    @id @default(cuid())
+  code       String    @unique
+  type       String    @default("percent") // "percent" | "fixed"
+  value      Int // percent: 1-90, fixed: rupees
+  minOrder   Int       @default(0)
+  active     Boolean   @default(true)
+  usageLimit Int       @default(0) // 0 = unlimited
+  usedCount  Int       @default(0)
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([active])
 }
 
 model OrderItem {

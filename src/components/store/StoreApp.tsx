@@ -21,6 +21,7 @@ import ProductView from "./views/ProductView";
 import ShopView from "./views/ShopView";
 import SuccessView from "./views/SuccessView";
 import TrackView from "./views/TrackView";
+import WishlistView from "./views/WishlistView";
 
 export default function StoreApp({ initialData }: { initialData: StoreInitialData }) {
   const [queryClient] = useState(
@@ -71,6 +72,9 @@ export default function StoreApp({ initialData }: { initialData: StoreInitialDat
       break;
     case "contact":
       view = <ContactView />;
+      break;
+    case "wishlist":
+      view = <WishlistView />;
       break;
     case "admin":
       view = <AdminApp />;

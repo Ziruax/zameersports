@@ -96,6 +96,8 @@ export interface AdminOrder {
   city: string
   notes: string
   subtotal: number
+  discount: number
+  couponCode: string
   shipping: number
   total: number
   paymentMethod: string
@@ -118,6 +120,8 @@ export function toAdminOrder(o: OrderWithItems): AdminOrder {
     city: o.city,
     notes: o.notes,
     subtotal: o.subtotal,
+    discount: o.discount,
+    couponCode: o.couponCode,
     shipping: o.shipping,
     total: o.total,
     paymentMethod: o.paymentMethod,

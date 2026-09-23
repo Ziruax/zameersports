@@ -3,7 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Banknote, Landmark, Loader2, MessageCircle, ShieldCheck, ShoppingBag } from "lucide-react";
+import { Banknote, Landmark, Loader2, MessageCircle, ShieldCheck, ShoppingBag, TicketPercent } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -49,8 +49,17 @@ type CheckoutValues = z.infer<typeof checkoutSchema>;
 interface OrderAck {
   orderNumber: string;
   subtotal: number;
+  discount: number;
   shipping: number;
   total: number;
+}
+
+interface AppliedCoupon {
+  code: string;
+  type: string;
+  value: number;
+  discount: number;
+  label: string;
 }
 
 /* Cart persistence uses skipHydration — subscribe to the store's hydration
@@ -75,6 +84,9 @@ export default function CheckoutView() {
   );
   const [placing, setPlacing] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponChecking, setCouponChecking] = useState(false);
 
   useEffect(() => {
     document.title = "Checkout | Zameer Sports";
@@ -97,8 +109,37 @@ export default function CheckoutView() {
   const threshold = Number(settings.free_shipping_threshold) || 5000;
   const fee = Number(settings.shipping_fee) || 250;
   const shipping = subtotal >= threshold ? 0 : fee;
-  const total = subtotal + shipping;
+  /* Keep the applied coupon honest: if the cart changes and the subtotal no
+     longer meets the coupon minimum, drop it instead of failing at submit. */
+  const couponDiscount = coupon ? coupon.discount : 0;
+  const total = Math.max(0, subtotal - couponDiscount) + shipping;
   const freeShipping = shipping === 0;
+
+  /* --------------------------------------------------------- coupon apply */
+
+  const applyCoupon = async () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code || couponChecking) return;
+    setCouponChecking(true);
+    try {
+      const res = await api<AppliedCoupon & { ok: boolean }>("/api/coupons/validate", {
+        method: "POST",
+        body: JSON.stringify({ code, subtotal }),
+      });
+      setCoupon(res);
+      toast.success(`Coupon applied: ${res.label}`);
+    } catch (err) {
+      setCoupon(null);
+      toast.error(err instanceof ApiError && err.message ? err.message : "Coupon could not be applied.");
+    } finally {
+      setCouponChecking(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setCoupon(null);
+    setCouponInput("");
+  };
   const paymentMethod = useWatch({ control: form.control, name: "paymentMethod" }) ?? "cod";
 
   /* ------------------------------------------------------------- states */
@@ -167,6 +208,7 @@ export default function CheckoutView() {
           city: values.city,
           notes: values.notes,
           items: items.map((i) => ({ productId: i.productId, qty: i.qty })),
+          couponCode: coupon?.code,
         }),
       });
       clear();
@@ -451,11 +493,66 @@ export default function CheckoutView() {
                 ))}
               </ul>
 
+              {/* Coupon */}
+              <div className="border-t border-neutral-100 pt-4">
+                <label htmlFor="coupon-code" className="mb-1.5 block text-sm font-semibold text-neutral-900">
+                  Discount Code
+                </label>
+                {coupon ? (
+                  <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+                    <p className="text-sm font-semibold text-emerald-800">
+                      <TicketPercent className="mr-1 inline size-4" aria-hidden="true" />
+                      {coupon.code} applied
+                      <span className="ml-1 font-normal text-emerald-600">({coupon.label})</span>
+                    </p>
+                    <button
+                      type="button"
+                      onClick={removeCoupon}
+                      className="text-xs font-bold text-red-600 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input
+                      id="coupon-code"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                      placeholder="e.g. WELCOME10"
+                      className="h-10 flex-1 uppercase"
+                      autoComplete="off"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => void applyCoupon()}
+                      disabled={couponChecking || !couponInput.trim()}
+                      className="h-10 px-4 font-semibold"
+                    >
+                      {couponChecking ? (
+                        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                      ) : (
+                        "Apply"
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-2 border-t border-neutral-100 pt-4 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-neutral-500">Subtotal</span>
                   <span className="font-medium text-neutral-900">{formatPrice(subtotal)}</span>
                 </div>
+                {couponDiscount > 0 ? (
+                  <div className="flex items-center justify-between">
+                    <span className="text-neutral-500">Coupon ({coupon?.code})</span>
+                    <span className="font-bold text-emerald-700">
+                      &minus;{formatPrice(couponDiscount)}
+                    </span>
+                  </div>
+                ) : null}
                 <div className="flex items-center justify-between">
                   <span className="text-neutral-500">Shipping</span>
                   {freeShipping ? (

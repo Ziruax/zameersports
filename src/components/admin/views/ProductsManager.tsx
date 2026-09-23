@@ -93,6 +93,8 @@ interface ProductFormState {
   tags: string;
   specs: SpecRow[];
   images: string[];
+  metaTitle: string;
+  metaDescription: string;
   featured: boolean;
   isNew: boolean;
   active: boolean;
@@ -110,6 +112,8 @@ const EMPTY_FORM: ProductFormState = {
   tags: "",
   specs: [],
   images: [],
+  metaTitle: "",
+  metaDescription: "",
   featured: false,
   isNew: false,
   active: true,
@@ -387,6 +391,8 @@ function buildInitial(
       ? []
       : Object.entries(detail?.specs ?? {}).map(([key, value]) => ({ key, value })),
     images: detailFailed ? (row.image ? [row.image] : []) : (detail?.images ?? []),
+    metaTitle: detailFailed ? "" : (detail?.metaTitle ?? ""),
+    metaDescription: detailFailed ? "" : (detail?.metaDescription ?? ""),
     featured: row.featured,
     isNew: row.isNew,
     active: row.active,
@@ -486,6 +492,8 @@ function ProductForm({
   const [specs, setSpecs] = useState<SpecRow[]>(initial.specs);
   const [images, setImages] = useState<string[]>(initial.images);
   const [imageUrl, setImageUrl] = useState("");
+  const [metaTitle, setMetaTitle] = useState(initial.metaTitle);
+  const [metaDescription, setMetaDescription] = useState(initial.metaDescription);
   const [featured, setFeatured] = useState(initial.featured);
   const [isNew, setNew] = useState(initial.isNew);
   const [active, setActive] = useState(initial.active);
@@ -560,6 +568,8 @@ function ProductForm({
           .map((s) => [s.key.trim(), s.value.trim()]),
       );
       data.images = images;
+      data.metaTitle = metaTitle.trim();
+      data.metaDescription = metaDescription.trim();
     }
     try {
       await save.mutateAsync({ id: productId, data });
@@ -822,6 +832,40 @@ function ProductForm({
             )}
           </div>
         </>
+      ) : null}
+
+      {/* SEO */}
+      {!detailFailed ? (
+        <div className="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50/60 p-4 sm:col-span-2">
+          <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+            SEO (optional)
+          </p>
+          <div className="space-y-1.5">
+            <Label htmlFor="product-meta-title">Meta title</Label>
+            <Input
+              id="product-meta-title"
+              value={metaTitle}
+              onChange={(e) => setMetaTitle(e.target.value)}
+              placeholder="Custom browser tab / search result title (max 150 characters)"
+            />
+            <p className="text-xs text-neutral-400">
+              Leave empty to use the product name automatically.
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="product-meta-desc">Meta description</Label>
+            <Textarea
+              id="product-meta-desc"
+              value={metaDescription}
+              onChange={(e) => setMetaDescription(e.target.value)}
+              placeholder="Short description for Google search results (max 320 characters)"
+              rows={3}
+            />
+            <p className="text-xs text-neutral-400">
+              Leave empty to use the first part of the product description.
+            </p>
+          </div>
+        </div>
       ) : null}
 
       {/* Switches */}

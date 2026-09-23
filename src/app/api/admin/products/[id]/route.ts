@@ -51,6 +51,8 @@ export async function PATCH(req: Request, { params }: Params) {
   if (d.active !== undefined) data.active = d.active
   if (d.tags !== undefined) data.tags = d.tags.join(",")
   if (d.specs !== undefined) data.specs = JSON.stringify(d.specs)
+  if (d.metaTitle !== undefined) data.metaTitle = d.metaTitle
+  if (d.metaDescription !== undefined) data.metaDescription = d.metaDescription
 
   try {
     if (d.slug !== undefined) {

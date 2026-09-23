@@ -112,6 +112,8 @@ export async function POST(req: Request) {
             badge: d.badge ?? "",
             tags: (d.tags ?? []).join(","),
             specs: JSON.stringify(d.specs ?? {}),
+            metaTitle: d.metaTitle ?? "",
+            metaDescription: d.metaDescription ?? "",
             featured: d.featured ?? false,
             isNew: d.isNew ?? false,
             active: d.active ?? true,
