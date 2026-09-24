@@ -13,19 +13,19 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cartCount, useCartStore } from "@/lib/cart-store";
-import { useHashRoute } from "@/hooks/use-hash-route";
+import { usePathRoute } from "@/hooks/use-path-route";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
-  { label: "Home", href: "#/", match: "home" },
-  { label: "All Shop", href: "#/shop", match: "shop:" },
-  { label: "Cricket", href: "#/shop?category=cricket", match: "shop:cricket" },
-  { label: "Football", href: "#/shop?category=football", match: "shop:football" },
-  { label: "Badminton", href: "#/shop?category=badminton", match: "shop:badminton" },
-  { label: "Trophies", href: "#/shop?category=trophies", match: "shop:trophies" },
-  { label: "Gym", href: "#/shop?category=gym", match: "shop:gym" },
-  { label: "About", href: "#/about", match: "about" },
-  { label: "Contact", href: "#/contact", match: "contact" },
+  { label: "Home", href: "/", match: "home" },
+  { label: "All Shop", href: "/shop", match: "shop:" },
+  { label: "Cricket", href: "/shop?category=cricket", match: "shop:cricket" },
+  { label: "Football", href: "/shop?category=football", match: "shop:football" },
+  { label: "Badminton", href: "/shop?category=badminton", match: "shop:badminton" },
+  { label: "Trophies", href: "/shop?category=trophies", match: "shop:trophies" },
+  { label: "Gym", href: "/shop?category=gym", match: "shop:gym" },
+  { label: "About", href: "/about", match: "about" },
+  { label: "Contact", href: "/contact", match: "contact" },
 ];
 
 function SearchBox({ onSearch }: { onSearch: (query: string) => void }) {
@@ -60,7 +60,7 @@ function SearchBox({ onSearch }: { onSearch: (query: string) => void }) {
 }
 
 export default function Header() {
-  const { route } = useHashRoute();
+  const { route, navigate } = usePathRoute();
   const items = useCartStore((s) => s.items);
   const openDrawer = useCartStore((s) => s.openDrawer);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -70,7 +70,7 @@ export default function Header() {
     route.name === "shop" ? `shop:${route.query.category ?? ""}` : route.name;
 
   const runSearch = (q: string) => {
-    window.location.hash = q ? `#/shop?search=${encodeURIComponent(q)}` : "#/shop";
+    navigate(q ? `/shop?search=${encodeURIComponent(q)}` : "/shop");
     setMobileOpen(false);
   };
 
@@ -78,7 +78,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 border-b border-neutral-200 bg-white/90 backdrop-blur">
       {/* Top row: brand / search / actions */}
       <div className="container flex items-center gap-3 py-3 sm:gap-6">
-        <a href="#/" className="flex shrink-0 items-center gap-2.5" aria-label="Zameer Sports home">
+        <a href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Zameer Sports home">
           <Image
             src="/images/brand/logo.png"
             alt="Zameer Sports logo"
@@ -105,7 +105,7 @@ export default function Header() {
 
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
           <a
-            href="#/track"
+            href="/track"
             aria-label="Track your order"
             className="hidden h-11 items-center gap-2 rounded-full px-3 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 hover:text-emerald-700 md:flex"
           >
@@ -113,7 +113,7 @@ export default function Header() {
             Track Order
           </a>
           <a
-            href="#/wishlist"
+            href="/wishlist"
             aria-label="Open your wishlist"
             className="flex size-11 items-center justify-center rounded-full text-neutral-800 transition-colors hover:bg-neutral-100 hover:text-emerald-700"
           >
@@ -185,7 +185,7 @@ export default function Header() {
                   </a>
                 ))}
                 <a
-                  href="#/track"
+                  href="/track"
                   onClick={() => setMobileOpen(false)}
                   className="flex h-11 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 md:hidden"
                 >

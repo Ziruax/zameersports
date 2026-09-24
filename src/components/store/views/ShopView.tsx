@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ProductCard from "@/components/store/ProductCard";
 import SectionHeading from "@/components/store/SectionHeading";
 import { useCategories, useProducts } from "@/hooks/use-catalog";
-import { useHashRoute } from "@/hooks/use-hash-route";
+import { usePathRoute } from "@/hooks/use-path-route";
 import { cn } from "@/lib/utils";
 import type { CategoryDTO } from "@/lib/types";
 
@@ -233,7 +233,7 @@ function FiltersPanel({
 }
 
 export default function ShopView() {
-  const { route, navigate } = useHashRoute();
+  const { route, navigate } = usePathRoute();
   const query = route.query;
 
   const category = query.category ?? "";
@@ -279,7 +279,7 @@ export default function ShopView() {
       sp.set(key, String(value));
     }
     const qs = sp.toString();
-    return qs ? `#/shop?${qs}` : "#/shop";
+    return qs ? `/shop?${qs}` : "/shop";
   };
 
   const selectCategory = (slug: string | null) =>
@@ -289,7 +289,7 @@ export default function ShopView() {
   const changeSort = (value: string) =>
     navigate(shopUrl({ sort: value === DEFAULT_SORT ? null : value, page: 1 }));
   const goToPage = (p: number) => navigate(shopUrl({ page: p }));
-  const clearAll = () => navigate("#/shop");
+  const clearAll = () => navigate("/shop");
 
   const chips: { key: FilterKey; label: string }[] = [];
   if (category) {
@@ -515,7 +515,7 @@ export default function ShopView() {
                 </Button>
               ) : (
                 <Button asChild variant="outline" className="mt-1 h-11 px-6 font-semibold">
-                  <a href="#/">Back to Home</a>
+                  <a href="/">Back to Home</a>
                 </Button>
               )}
             </div>

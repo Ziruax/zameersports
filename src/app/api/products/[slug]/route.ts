@@ -1,4 +1,5 @@
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
+import type { ProductRow } from "@/lib/db-types"
 import { withRetry } from "@/lib/retry"
 import type { ProductDetail } from "@/lib/types"
 import { dbErrorResponse, parseImages, parseSpecs, parseTags, toListItem } from "../../_lib/helpers"
@@ -8,12 +9,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   const { slug } = await params
 
   try {
+    /* Prisma include { category: { select: { name, slug } } } → LEFT JOIN, flat columns */
     const product = await withRetry(
       () =>
-        db.product.findFirst({
-          where: { slug, active: true },
-          include: { category: { select: { name: true, slug: true } } },
-        }),
+        query<ProductRow & { categoryName: string; categorySlug: string }>(
+          "SELECT p.*, c.name AS categoryName, c.slug AS categorySlug FROM Product p LEFT JOIN Category c ON c.id = p.categoryId WHERE p.slug = ? AND p.active = 1 LIMIT 1",
+          [slug],
+        ).then((rows) => rows[0] ?? null),
       { label: "products:detail" },
     )
     if (!product) {
@@ -22,11 +24,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
 
     const relatedRows = await withRetry(
       () =>
-        db.product.findMany({
-          where: { active: true, categoryId: product.categoryId, slug: { not: slug } },
-          orderBy: { sold: "desc" },
-          take: 4,
-        }),
+        query<ProductRow>(
+          "SELECT * FROM Product WHERE active = 1 AND categoryId = ? AND slug <> ? ORDER BY sold DESC LIMIT 4",
+          [product.categoryId, slug],
+        ),
       { label: "products:related" },
     )
 
@@ -40,8 +41,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
       featured: product.featured,
       metaTitle: product.metaTitle,
       metaDescription: product.metaDescription,
-      categoryName: product.category.name,
-      categorySlug: product.category.slug,
+      categoryName: product.categoryName,
+      categorySlug: product.categorySlug,
       related: relatedRows.map(toListItem),
     }
     return Response.json(detail)

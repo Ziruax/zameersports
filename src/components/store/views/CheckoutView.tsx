@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { useHashRoute } from "@/hooks/use-hash-route";
+import { usePathRoute } from "@/hooks/use-path-route";
 import { useSettings } from "@/hooks/use-checkout";
 import { ApiError, api } from "@/lib/api";
 import { cartSubtotal, useCartStore } from "@/lib/cart-store";
@@ -74,7 +74,7 @@ const getServerCartHydrated = () => false;
 export default function CheckoutView() {
   const items = useCartStore((s) => s.items);
   const clear = useCartStore((s) => s.clear);
-  const { navigate } = useHashRoute();
+  const { navigate } = usePathRoute();
   const settings = useSettings();
 
   const cartHydrated = useSyncExternalStore(
@@ -184,7 +184,7 @@ export default function CheckoutView() {
               </p>
             </div>
             <Button asChild className="h-11 px-8 font-semibold">
-              <a href="#/shop">Shop Sports Gear</a>
+              <a href="/shop">Shop Sports Gear</a>
             </Button>
           </CardContent>
         </Card>
@@ -214,7 +214,7 @@ export default function CheckoutView() {
       clear();
       setRedirecting(true);
       toast.success("Order placed!");
-      navigate(`#/success/${ack.orderNumber}`);
+      navigate(`/success/${ack.orderNumber}`);
     } catch (err) {
       const message =
         err instanceof ApiError && err.message

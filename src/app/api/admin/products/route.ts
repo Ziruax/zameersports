@@ -1,12 +1,11 @@
-import type { Prisma } from "@prisma/client"
 import { NextResponse } from "next/server"
-import { db } from "@/lib/db"
+import { execute, isDuplicateEntryError, newId, query } from "@/lib/db"
+import type { ProductRow } from "@/lib/db-types"
 import { cacheInvalidate } from "@/lib/cache"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../../_lib/helpers"
 import {
   badRequest,
-  prismaErrorCode,
   readJson,
   requireAdmin,
   unauthorized,
@@ -15,6 +14,16 @@ import {
 import { toAdminProductFull, toAdminProductRow } from "../_lib/mappers"
 import { ProductCreateSchema } from "../_lib/schemas"
 import { slugify, uniqueProductSlug } from "../_lib/slug"
+
+type ProductJoinRow = ProductRow & { categoryName: string | null }
+
+/** Fetch a single product row with its category name (flat JOIN column). */
+function fetchProduct(id: string): Promise<ProductJoinRow | null> {
+  return query<ProductJoinRow>(
+    "SELECT p.*, c.name AS categoryName FROM Product p LEFT JOIN Category c ON c.id = p.categoryId WHERE p.id = ? LIMIT 1",
+    [id],
+  ).then((rows) => rows[0] ?? null)
+}
 
 /**
  * GET /api/admin/products — admin table listing (includes inactive products).
@@ -31,31 +40,34 @@ export async function GET(req: Request) {
   const page = Math.max(1, Number.parseInt(sp.get("page") ?? "1", 10) || 1)
   const limit = Math.min(100, Math.max(1, Number.parseInt(sp.get("limit") ?? "10", 10) || 10))
 
-  const where: Prisma.ProductWhereInput = {}
+  const conditions: string[] = []
+  const params: unknown[] = []
   if (search) {
-    where.OR = [
-      { name: { contains: search } },
-      { brand: { contains: search } },
-      { slug: { contains: search } },
-    ]
+    conditions.push("(p.name LIKE ? OR p.brand LIKE ? OR p.slug LIKE ?)")
+    const like = `%${search}%`
+    params.push(like, like, like)
   }
   if (category) {
-    where.category = { OR: [{ id: category }, { slug: category }] }
+    conditions.push("(p.categoryId = ? OR c.slug = ?)")
+    params.push(category, category)
   }
+  const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : ""
+  const base = "FROM Product p LEFT JOIN Category c ON c.id = p.categoryId"
+  const offset = (page - 1) * limit // validated integer — safe to interpolate
 
   try {
-    const [total, rows] = await withRetry(
-      () =>
-        db.$transaction([
-          db.product.count({ where }),
-          db.product.findMany({
-            where,
-            orderBy: { createdAt: "desc" },
-            skip: (page - 1) * limit,
-            take: limit,
-            include: { category: { select: { id: true, name: true } } },
-          }),
-        ]),
+    const { total, rows } = await withRetry(
+      async () => {
+        const countRows = await query<{ cnt: number }>(
+          `SELECT COUNT(*) AS cnt ${base} ${where}`,
+          params,
+        )
+        const rows = await query<ProductJoinRow>(
+          `SELECT p.*, c.name AS categoryName ${base} ${where} ORDER BY p.createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
+          params,
+        )
+        return { total: Number(countRows[0]?.cnt ?? 0), rows }
+      },
       { label: "admin:products:list" },
     )
 
@@ -86,47 +98,51 @@ export async function POST(req: Request) {
   const d = parsed.data
 
   try {
-    const category = await withRetry(
-      () => db.category.findUnique({ where: { id: d.categoryId }, select: { id: true } }),
+    const categoryRows = await withRetry(
+      () => query<{ id: string }>("SELECT id FROM Category WHERE id = ? LIMIT 1", [d.categoryId]),
       { label: "admin:products:check-category" },
     )
-    if (!category) return badRequest("Category not found")
+    if (categoryRows.length === 0) return badRequest("Category not found")
 
-    // Explicit slug is used as-is (collisions → P2002 → 400 below);
+    // Explicit slug is used as-is (collisions → duplicate key → 400 below);
     // auto-derived slugs get -2/-3 suffixes until unique.
     const slug = d.slug !== undefined ? d.slug : await uniqueProductSlug(slugify(d.name))
 
-    const product = await withRetry(
+    const id = newId()
+    await withRetry(
       () =>
-        db.product.create({
-          data: {
-            name: d.name,
+        execute(
+          "INSERT INTO Product (id, name, slug, brand, description, price, comparePrice, stock, images, categoryId, badge, tags, specs, metaTitle, metaDescription, featured, isNew, active, updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP(3))",
+          [
+            id,
+            d.name,
             slug,
-            brand: d.brand ?? "",
-            description: d.description ?? "",
-            price: d.price,
-            comparePrice: d.comparePrice ?? null,
-            stock: d.stock,
-            images: JSON.stringify(d.images ?? []),
-            categoryId: d.categoryId,
-            badge: d.badge ?? "",
-            tags: (d.tags ?? []).join(","),
-            specs: JSON.stringify(d.specs ?? {}),
-            metaTitle: d.metaTitle ?? "",
-            metaDescription: d.metaDescription ?? "",
-            featured: d.featured ?? false,
-            isNew: d.isNew ?? false,
-            active: d.active ?? true,
-          },
-          include: { category: { select: { id: true, name: true } } },
-        }),
+            d.brand ?? "",
+            d.description ?? "",
+            d.price,
+            d.comparePrice ?? null,
+            d.stock,
+            JSON.stringify(d.images ?? []),
+            d.categoryId,
+            d.badge ?? "",
+            (d.tags ?? []).join(","),
+            JSON.stringify(d.specs ?? {}),
+            d.metaTitle ?? "",
+            d.metaDescription ?? "",
+            d.featured ?? false,
+            d.isNew ?? false,
+            d.active ?? true,
+          ],
+        ),
       { label: "admin:products:create" },
     )
 
+    const product = await withRetry(() => fetchProduct(id), { label: "admin:products:get-created" })
+
     cacheInvalidate("categories") // category product counts changed
-    return NextResponse.json({ product: toAdminProductFull(product) }, { status: 201 })
+    return NextResponse.json({ product: toAdminProductFull(product!) }, { status: 201 })
   } catch (err) {
-    if (prismaErrorCode(err) === "P2002") return badRequest("Slug already exists")
+    if (isDuplicateEntryError(err)) return badRequest("Slug already exists")
     return dbErrorResponse(err, "admin:products:create")
   }
 }

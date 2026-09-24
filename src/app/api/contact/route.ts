@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { db } from "@/lib/db"
+import { execute, newId } from "@/lib/db"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../_lib/helpers"
 
@@ -37,15 +37,10 @@ export async function POST(req: Request) {
   try {
     await withRetry(
       () =>
-        db.contactMessage.create({
-          data: {
-            name,
-            email: parsed.data.email || "",
-            phone: parsed.data.phone || "",
-            subject: parsed.data.subject || "",
-            message,
-          },
-        }),
+        execute(
+          "INSERT INTO ContactMessage (id, name, email, phone, subject, message) VALUES (?,?,?,?,?,?)",
+          [newId(), name, parsed.data.email || "", parsed.data.phone || "", parsed.data.subject || "", message],
+        ),
       { label: "contact:create" },
     )
     return Response.json({ ok: true }, { status: 201 })

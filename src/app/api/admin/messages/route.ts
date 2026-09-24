@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
+import type { ContactMessageRow } from "@/lib/db-types"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../../_lib/helpers"
 import { requireAdmin, unauthorized } from "../_lib/guard"
@@ -12,7 +13,7 @@ export async function GET(req: Request) {
 
   try {
     const rows = await withRetry(
-      () => db.contactMessage.findMany({ orderBy: { createdAt: "desc" } }),
+      () => query<ContactMessageRow>("SELECT * FROM ContactMessage ORDER BY createdAt DESC"),
       { label: "admin:messages:list" },
     )
     return NextResponse.json({ items: rows.map(toAdminMessage) })

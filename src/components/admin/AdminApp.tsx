@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { toast } from "sonner";
-import { useHashRoute } from "@/hooks/use-hash-route";
+import { usePathRoute } from "@/hooks/use-path-route";
 import {
   adminErrorMessage,
   useAdminLogout,
@@ -65,7 +65,7 @@ const SECTION_TITLES: Record<Section, string> = {
 };
 
 /**
- * Admin dashboard SPA view (#/admin). Renders as a fixed full-screen overlay
+ * Admin dashboard SPA view (/admin). Renders as a fixed full-screen overlay
  * on top of the storefront with its own sidebar + topbar layout.
  */
 export default function AdminApp() {
@@ -128,7 +128,7 @@ function AdminShell({
   onSection: (section: Section) => void;
   onSessionEnd: () => void;
 }) {
-  const { navigate } = useHashRoute();
+  const { navigate } = usePathRoute();
   const logout = useAdminLogout();
   const stats = useAdminStats();
   const messages = useAdminMessages();
@@ -231,7 +231,7 @@ function AdminShell({
         <div className="space-y-1 border-t border-neutral-800 py-3">
           <button
             type="button"
-            onClick={() => navigate("#/")}
+            onClick={() => navigate("/")}
             title="View Store"
             className="flex h-11 w-full items-center justify-center gap-3 text-sm font-medium text-neutral-400 transition-colors hover:bg-neutral-800/60 hover:text-white lg:justify-start lg:px-4"
           >

@@ -1,4 +1,4 @@
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
 import { withRetry } from "@/lib/retry"
 
 /**
@@ -33,8 +33,8 @@ async function ensureUnique(
 export async function uniqueProductSlug(base: string): Promise<string> {
   return ensureUnique(base, "product", (slug) =>
     withRetry(async () => {
-      const row = await db.product.findUnique({ where: { slug }, select: { id: true } })
-      return row !== null
+      const rows = await query<{ id: string }>("SELECT id FROM Product WHERE slug = ? LIMIT 1", [slug])
+      return rows.length > 0
     }, { label: "admin:slug-check-product" }),
   )
 }
@@ -43,8 +43,8 @@ export async function uniqueProductSlug(base: string): Promise<string> {
 export async function uniqueCategorySlug(base: string): Promise<string> {
   return ensureUnique(base, "category", (slug) =>
     withRetry(async () => {
-      const row = await db.category.findUnique({ where: { slug }, select: { id: true } })
-      return row !== null
+      const rows = await query<{ id: string }>("SELECT id FROM Category WHERE slug = ? LIMIT 1", [slug])
+      return rows.length > 0
     }, { label: "admin:slug-check-category" }),
   )
 }

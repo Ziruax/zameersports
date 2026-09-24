@@ -19,7 +19,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { useSettings } from "@/hooks/use-catalog";
-import { useHashRoute } from "@/hooks/use-hash-route";
+import { usePathRoute } from "@/hooks/use-path-route";
 import { cartCount, cartSubtotal, useCartStore, type CartItem } from "@/lib/cart-store";
 import { formatPrice } from "@/lib/format";
 
@@ -86,7 +86,7 @@ function CartRow({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <a
-              href={`#/product/${item.slug}`}
+              href={`/product/${item.slug}`}
               className="line-clamp-2 text-sm font-semibold text-neutral-900 hover:text-emerald-700"
             >
               {item.name}
@@ -147,7 +147,7 @@ function ClearCartButton({ onClear }: { onClear: () => void }) {
 }
 
 export default function CartView() {
-  const { navigate } = useHashRoute();
+  const { navigate } = usePathRoute();
   const items = useCartStore((s) => s.items);
   const setQty = useCartStore((s) => s.setQty);
   const remove = useCartStore((s) => s.remove);
@@ -182,7 +182,7 @@ export default function CartView() {
         </p>
         <Button
           type="button"
-          onClick={() => navigate("#/shop")}
+          onClick={() => navigate("/shop")}
           className="mt-2 h-12 bg-emerald-700 px-8 text-base font-semibold text-white hover:bg-emerald-800"
         >
           Start Shopping
@@ -217,7 +217,7 @@ export default function CartView() {
           </Card>
           <div className="mt-4 flex items-center justify-between">
             <Button asChild variant="ghost" className="h-11 font-semibold">
-              <a href="#/shop" aria-label="Continue shopping">
+              <a href="/shop" aria-label="Continue shopping">
                 Continue Shopping
               </a>
             </Button>
@@ -273,13 +273,13 @@ export default function CartView() {
               asChild
               className="h-12 w-full bg-emerald-700 text-base font-semibold text-white hover:bg-emerald-800"
             >
-              <a href="#/checkout" aria-label="Proceed to checkout">
+              <a href="/checkout" aria-label="Proceed to checkout">
                 Proceed to Checkout
                 <ArrowRight className="size-4" aria-hidden="true" />
               </a>
             </Button>
             <Button asChild variant="ghost" className="h-11 w-full font-semibold">
-              <a href="#/shop" aria-label="Continue shopping">
+              <a href="/shop" aria-label="Continue shopping">
                 Continue Shopping
               </a>
             </Button>

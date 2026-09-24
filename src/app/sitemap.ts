@@ -1,26 +1,71 @@
 import type { MetadataRoute } from "next";
+import { query } from "@/lib/db";
 
 /**
- * ZameerSports.shop is a single-page application (Next.js App Router) whose
- * shop / product / cart / checkout views are client-side HASH routes
- * (#/shop, #/product/<slug>, ...). Hash fragments are not indexable by search
- * engines and do not create distinct URLs, so the sitemap can only declare the
- * one canonical URL.
- *
- * SEO tradeoff (documented deliberately): individual product pages are not
- * independently crawlable. Product visibility comes from (a) the
- * server-rendered home page HTML (featured products + prices in SSR output)
- * and (b) client-injected Product JSON-LD on the product view. If per-product
- * URLs are ever needed, migrate hash routes to real App Router paths and add
- * one sitemap entry per product here.
+ * Never statically cache the sitemap at build time — product slugs change
+ * with the live MySQL database.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [
+export const dynamic = "force-dynamic";
+
+const SITE_URL = "https://zameersports.shop";
+
+/**
+ * Clean-path sitemap for zameersports.shop: static storefront routes plus one
+ * entry per active product (/product/<slug>). Reads products straight from
+ * MySQL via the shared mysql2 pool. A DB failure must NEVER make the sitemap
+ * 500 — on error we fall back to the static routes only.
+ */
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
+
+  const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: "https://zameersports.shop/",
-      lastModified: new Date(),
+      url: `${SITE_URL}/`,
+      lastModified: now,
       changeFrequency: "daily",
       priority: 1,
     },
+    {
+      url: `${SITE_URL}/shop`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/about`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/contact`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${SITE_URL}/track`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
   ];
+
+  try {
+    const products = await query<{ slug: string; updatedAt: Date }>(
+      "SELECT slug, updatedAt FROM Product WHERE active = 1",
+    );
+
+    const productRoutes: MetadataRoute.Sitemap = products.map((p) => ({
+      url: `${SITE_URL}/product/${p.slug}`,
+      lastModified: p.updatedAt instanceof Date ? p.updatedAt : new Date(p.updatedAt),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    }));
+
+    return [...staticRoutes, ...productRoutes];
+  } catch {
+    // Database unavailable — serve the static routes rather than erroring.
+    return staticRoutes;
+  }
 }

@@ -1,4 +1,5 @@
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
+import type { CategoryRow } from "@/lib/db-types"
 import { cacheGet, cacheSet } from "@/lib/cache"
 import { withRetry } from "@/lib/retry"
 import type { CategoryDTO } from "@/lib/types"
@@ -14,19 +15,18 @@ export async function GET() {
   if (cached) return Response.json(cached)
 
   try {
-    const { rows, grouped } = await withRetry(
+    const { rows, counts } = await withRetry(
       async () => {
-        const rows = await db.category.findMany({ orderBy: { sortOrder: "asc" } })
-        const grouped = await db.product.groupBy({
-          by: ["categoryId"],
-          where: { active: true },
-          _count: { _all: true },
-        })
-        return { rows, grouped }
+        const rows = await query<CategoryRow>(
+          "SELECT * FROM Category ORDER BY sortOrder ASC, name ASC",
+        )
+        const countRows = await query<{ categoryId: string; cnt: number }>(
+          "SELECT categoryId, COUNT(*) AS cnt FROM Product WHERE active = 1 GROUP BY categoryId",
+        )
+        return { rows, counts: new Map(countRows.map((r) => [r.categoryId, Number(r.cnt)])) }
       },
       { label: "categories:list" },
     )
-    const counts = new Map(grouped.map((g) => [g.categoryId, g._count._all]))
     const payload: CategoryDTO[] = rows.map((c) => toCategoryDTO(c, counts.get(c.id) ?? 0))
     cacheSet(CACHE_KEY, payload)
     return Response.json(payload)

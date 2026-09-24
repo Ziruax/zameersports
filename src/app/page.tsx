@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+import { query } from "@/lib/db";
+import type { CategoryRow, ProductRow, TestimonialRow } from "@/lib/db-types";
 import { withRetry } from "@/lib/retry";
 import { getSettings } from "@/lib/settings";
 import type {
@@ -11,9 +12,6 @@ import type {
 import StoreApp from "@/components/store/StoreApp";
 
 export const dynamic = "force-dynamic";
-
-type CategoryRow = Awaited<ReturnType<typeof db.category.findMany>>[number];
-type ProductRow = Awaited<ReturnType<typeof db.product.findMany>>[number];
 
 function firstImage(imagesJson: string): string {
   try {
@@ -47,13 +45,12 @@ function mapProduct(p: ProductRow): ProductListItem {
 async function fetchCategories(): Promise<CategoryDTO[]> {
   const rows = await withRetry(
     () =>
-      db.category.findMany({
-        orderBy: { sortOrder: "asc" },
-        include: { _count: { select: { products: true } } },
-      }),
+      query<CategoryRow & { productCount: number }>(
+        "SELECT c.*, (SELECT COUNT(*) FROM Product p WHERE p.categoryId = c.id) AS productCount FROM Category c ORDER BY c.sortOrder ASC",
+      ),
     { attempts: 3, label: "home:categories" },
   );
-  return rows.map((c: CategoryRow & { _count: { products: number } }) => ({
+  return rows.map((c) => ({
     id: c.id,
     slug: c.slug,
     name: c.name,
@@ -62,18 +59,13 @@ async function fetchCategories(): Promise<CategoryDTO[]> {
     icon: c.icon,
     featured: c.featured,
     sortOrder: c.sortOrder,
-    productCount: c._count.products,
+    productCount: Number(c.productCount),
   }));
 }
 
 async function fetchFeatured(): Promise<ProductsResponse> {
   const rows = await withRetry(
-    () =>
-      db.product.findMany({
-        where: { featured: true, active: true },
-        orderBy: { sold: "desc" },
-        take: 8,
-      }),
+    () => query<ProductRow>("SELECT * FROM Product WHERE featured = 1 AND active = 1 ORDER BY sold DESC LIMIT 8"),
     { attempts: 3, label: "home:featured" },
   );
   const items = rows.map(mapProduct);
@@ -83,7 +75,7 @@ async function fetchFeatured(): Promise<ProductsResponse> {
 async function fetchTestimonials(): Promise<TestimonialDTO[]> {
   // NOTE: Testimonial model has no createdAt column, so no ordering applied.
   return withRetry(
-    () => db.testimonial.findMany({ where: { featured: true } }),
+    () => query<TestimonialRow>("SELECT * FROM Testimonial WHERE featured = 1"),
     { attempts: 3, label: "home:testimonials" },
   );
 }

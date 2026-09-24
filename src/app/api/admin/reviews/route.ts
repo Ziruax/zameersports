@@ -1,10 +1,12 @@
-import type { Prisma } from "@prisma/client"
 import { NextResponse } from "next/server"
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
+import type { ReviewRow } from "@/lib/db-types"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../../_lib/helpers"
 import { requireAdmin, unauthorized } from "../_lib/guard"
 import { toAdminReview } from "../_lib/mappers"
+
+type ReviewJoinRow = ReviewRow & { productName: string | null }
 
 /**
  * GET /api/admin/reviews — all reviews, latest first, with product names.
@@ -15,18 +17,16 @@ export async function GET(req: Request) {
   if (!admin) return unauthorized()
 
   const approvedParam = new URL(req.url).searchParams.get("approved")?.trim() ?? ""
-  const where: Prisma.ReviewWhereInput = {}
-  if (approvedParam === "true") where.approved = true
-  else if (approvedParam === "false") where.approved = false
+  let where = ""
+  if (approvedParam === "true") where = "WHERE r.approved = 1"
+  else if (approvedParam === "false") where = "WHERE r.approved = 0"
 
   try {
     const rows = await withRetry(
       () =>
-        db.review.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-          include: { product: { select: { name: true } } },
-        }),
+        query<ReviewJoinRow>(
+          `SELECT r.*, p.name AS productName FROM Review r LEFT JOIN Product p ON p.id = r.productId ${where} ORDER BY r.createdAt DESC`,
+        ),
       { label: "admin:reviews:list" },
     )
     return NextResponse.json({ items: rows.map(toAdminReview) })

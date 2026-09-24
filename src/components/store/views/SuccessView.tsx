@@ -133,10 +133,10 @@ export default function SuccessView({ orderNumber }: { orderNumber: string }) {
         {/* actions */}
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button asChild className="h-11 w-full px-6 font-semibold sm:w-auto">
-            <a href={`#/track?order=${encodeURIComponent(orderNumber)}`}>Track Your Order</a>
+            <a href={`/track?order=${encodeURIComponent(orderNumber)}`}>Track Your Order</a>
           </Button>
           <Button asChild variant="outline" className="h-11 w-full px-6 font-medium sm:w-auto">
-            <a href="#/shop">Continue Shopping</a>
+            <a href="/shop">Continue Shopping</a>
           </Button>
           <Button
             asChild

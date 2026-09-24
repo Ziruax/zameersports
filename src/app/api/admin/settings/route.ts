@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { db } from "@/lib/db"
+import { execute } from "@/lib/db"
 import { cacheInvalidate } from "@/lib/cache"
 import { getSettings } from "@/lib/settings"
 import { withRetry } from "@/lib/retry"
@@ -53,12 +53,15 @@ export async function PATCH(req: Request) {
 
   try {
     if (entries.length > 0) {
+      // Single atomic multi-row upsert (`key`/`value` are reserved words — backticked).
+      const placeholders = entries.map(() => "(?, ?)").join(", ")
+      const params: unknown[] = []
+      for (const [key, value] of entries) params.push(key, value)
       await withRetry(
         () =>
-          db.$transaction(
-            entries.map(([key, value]) =>
-              db.setting.upsert({ where: { key }, create: { key, value }, update: { value } }),
-            ),
+          execute(
+            `INSERT INTO Setting (\`key\`, \`value\`) VALUES ${placeholders} ON DUPLICATE KEY UPDATE \`value\` = VALUES(\`value\`)`,
+            params,
           ),
         { label: "admin:settings:update" },
       )

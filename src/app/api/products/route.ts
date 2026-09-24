@@ -1,14 +1,15 @@
-import type { Prisma } from "@prisma/client"
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
+import type { ProductRow } from "@/lib/db-types"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse, toListItem } from "../_lib/helpers"
 
-const SORT_OPTIONS: Record<string, Prisma.ProductOrderByWithRelationInput[]> = {
-  new: [{ createdAt: "desc" }],
-  "price-asc": [{ price: "asc" }],
-  "price-desc": [{ price: "desc" }],
-  popular: [{ sold: "desc" }],
-  rating: [{ rating: "desc" }],
+/** SQL ORDER BY fragments mirroring the previous Prisma orderBy inputs. */
+const SORT_SQL: Record<string, string> = {
+  new: "createdAt DESC",
+  "price-asc": "price ASC",
+  "price-desc": "price DESC",
+  popular: "sold DESC",
+  rating: "rating DESC",
 }
 
 function parseNumberParam(value: string | null): number | null {
@@ -34,30 +35,45 @@ export async function GET(req: Request) {
   const page = Math.max(1, Math.max(0, Number.parseInt(sp.get("page") ?? "1", 10) || 1))
   const limit = Math.min(24, Math.max(1, Number.parseInt(sp.get("limit") ?? "12", 10) || 12))
 
-  const orderBy = SORT_OPTIONS[sort] ?? SORT_OPTIONS.new
+  const orderBy = SORT_SQL[sort] ?? SORT_SQL.new
 
-  const where: Prisma.ProductWhereInput = { active: true }
-  if (category) where.category = { slug: category }
-  if (featured) where.featured = true
-  if (isNew) where.isNew = true
-  if (min !== null || max !== null) {
-    where.price = {
-      ...(min !== null ? { gte: Math.trunc(min) } : {}),
-      ...(max !== null ? { lte: Math.trunc(max) } : {}),
-    }
+  /* WHERE builder — one clause per Prisma where input, joined with AND */
+  const where: string[] = ["active = 1"]
+  const params: unknown[] = []
+  if (category) {
+    where.push("categoryId IN (SELECT id FROM Category WHERE slug = ?)")
+    params.push(category)
+  }
+  if (featured) where.push("featured = 1")
+  if (isNew) where.push("isNew = 1")
+  if (min !== null) {
+    where.push("price >= ?")
+    params.push(Math.trunc(min))
+  }
+  if (max !== null) {
+    where.push("price <= ?")
+    params.push(Math.trunc(max))
   }
   if (search) {
-    // MySQL default collation is case-insensitive → contains is CI.
-    where.OR = [{ name: { contains: search } }, { brand: { contains: search } }, { tags: { contains: search } }]
+    // MySQL default collation is case-insensitive → LIKE is CI.
+    where.push("(name LIKE ? OR brand LIKE ? OR tags LIKE ?)")
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`)
   }
+  const whereSql = where.join(" AND ")
 
   try {
     const [total, rows] = await withRetry(
-      () =>
-        db.$transaction([
-          db.product.count({ where }),
-          db.product.findMany({ where, orderBy, skip: (page - 1) * limit, take: limit }),
-        ]),
+      async () => {
+        const countRows = await query<{ cnt: number }>(
+          `SELECT COUNT(*) AS cnt FROM Product WHERE ${whereSql}`,
+          params,
+        )
+        const rows = await query<ProductRow>(
+          `SELECT * FROM Product WHERE ${whereSql} ORDER BY ${orderBy} LIMIT ${limit} OFFSET ${(page - 1) * limit}`,
+          params,
+        )
+        return [Number(countRows[0]?.cnt ?? 0), rows] as const
+      },
       { label: "products:list" },
     )
     return Response.json({

@@ -1,5 +1,6 @@
 import { z } from "zod"
-import { db } from "@/lib/db"
+import { newId, query, withTransaction } from "@/lib/db"
+import type { ReviewRow } from "@/lib/db-types"
 import { cacheInvalidate } from "@/lib/cache"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse, toReviewDTO } from "../_lib/helpers"
@@ -21,10 +22,10 @@ export async function GET(req: Request) {
   try {
     const rows = await withRetry(
       () =>
-        db.review.findMany({
-          where: { productId, approved: true },
-          orderBy: { createdAt: "desc" },
-        }),
+        query<ReviewRow>(
+          "SELECT * FROM Review WHERE productId = ? AND approved = 1 ORDER BY createdAt DESC",
+          [productId],
+        ),
       { label: "reviews:list" },
     )
     return Response.json(rows.map(toReviewDTO))
@@ -59,7 +60,10 @@ export async function POST(req: Request) {
 
   try {
     const product = await withRetry(
-      () => db.product.findFirst({ where: { id: productId, active: true }, select: { id: true } }),
+      () =>
+        query<{ id: string }>("SELECT id FROM Product WHERE id = ? AND active = 1 LIMIT 1", [
+          productId,
+        ]).then((rows) => rows[0] ?? null),
       { label: "reviews:check-product" },
     )
     if (!product) {
@@ -70,41 +74,56 @@ export async function POST(req: Request) {
      * within the last 60 seconds is treated as a duplicate (client re-click or
      * withRetry re-running an insert that already committed during a DB flake
      * window) and is returned as-is instead of inserting a second row. The
-     * check lives INSIDE the retried closure so a post-commit retry also
+     * check lives INSIDE the retried transaction so a post-commit retry also
      * short-circuits on the row it already wrote. */
     const dupSince = new Date(Date.now() - 60_000)
-    const inserted = await withRetry(async () => {
-      const dupe = await db.review.findFirst({
-        where: { productId, name, comment, createdAt: { gte: dupSince } },
-        orderBy: { createdAt: "desc" },
-      })
-      if (dupe) return { review: dupe, duplicate: true }
-      const review = await db.review.create({
-        data: { productId, name, rating, comment, approved: true },
-      })
-      return { review, duplicate: false }
-    }, { label: "reviews:create" })
-
-    const agg = await withRetry(
+    const inserted = await withRetry(
       () =>
-        db.review.aggregate({
-          where: { productId, approved: true },
-          _avg: { rating: true },
-          _count: true,
+        withTransaction(async (conn) => {
+          const [dupePacks] = await conn.query(
+            "SELECT * FROM Review WHERE productId = ? AND name = ? AND comment = ? AND createdAt >= ? ORDER BY createdAt DESC LIMIT 1",
+            [productId, name, comment, dupSince],
+          )
+          const dupe = (dupePacks as ReviewRow[])[0] ?? null
+          let review: ReviewRow
+          if (dupe) {
+            review = dupe
+          } else {
+            const id = newId()
+            await conn.query(
+              "INSERT INTO Review (id, productId, name, rating, comment, approved) VALUES (?,?,?,?,?,1)",
+              [id, productId, name, rating, comment],
+            )
+            /* read the row back for DB-authoritative createdAt */
+            const [rows] = await conn.query("SELECT * FROM Review WHERE id = ?", [id])
+            review = (rows as ReviewRow[])[0]
+          }
+          /* recalc product aggregates over all approved reviews */
+          const [aggPacks] = await conn.query(
+            "SELECT AVG(rating) AS avgRating, COUNT(*) AS cnt FROM Review WHERE productId = ? AND approved = 1",
+            [productId],
+          )
+          const agg = (aggPacks as { avgRating: number | null; cnt: number }[])[0]
+          const newRating = Math.round(Number(agg?.avgRating ?? 0) * 10) / 10
+          const newCount = Number(agg?.cnt ?? 0)
+          await conn.query(
+            "UPDATE Product SET rating = ?, reviewCount = ?, updatedAt = CURRENT_TIMESTAMP(3) WHERE id = ?",
+            [newRating, newCount, productId],
+          )
+          return { review, newRating, newCount, duplicate: Boolean(dupe) }
         }),
-      { label: "reviews:aggregate" },
-    )
-    const newRating = Math.round((agg._avg.rating ?? 0) * 10) / 10
-    const newCount = agg._count
-
-    await withRetry(
-      () => db.product.update({ where: { id: productId }, data: { rating: newRating, reviewCount: newCount } }),
-      { label: "reviews:update-product" },
+      { label: "reviews:create" },
     )
 
     cacheInvalidate("products")
     return Response.json(
-      { ok: true, rating: newRating, reviewCount: newCount, duplicate: inserted.duplicate, review: toReviewDTO(inserted.review) },
+      {
+        ok: true,
+        rating: inserted.newRating,
+        reviewCount: inserted.newCount,
+        duplicate: inserted.duplicate,
+        review: toReviewDTO(inserted.review),
+      },
       { status: 201 },
     )
   } catch (err) {

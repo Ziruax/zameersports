@@ -1,13 +1,12 @@
-import type { Prisma } from "@prisma/client"
 import { NextResponse } from "next/server"
-import { db } from "@/lib/db"
+import { execute, isDuplicateEntryError, query } from "@/lib/db"
+import type { CategoryRow } from "@/lib/db-types"
 import { cacheInvalidate } from "@/lib/cache"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../../../_lib/helpers"
 import {
   badRequest,
   notFound,
-  prismaErrorCode,
   readJson,
   requireAdmin,
   unauthorized,
@@ -17,6 +16,16 @@ import { toAdminCategory } from "../../_lib/mappers"
 import { CategoryUpdateSchema } from "../../_lib/schemas"
 
 type Params = { params: Promise<{ id: string }> }
+
+type CategoryCountRow = CategoryRow & { productCount: number }
+
+/** Fetch one category with its (admin) product count. */
+function fetchCategory(id: string): Promise<CategoryCountRow | null> {
+  return query<CategoryCountRow>(
+    "SELECT c.*, (SELECT COUNT(*) FROM Product p WHERE p.categoryId = c.id) AS productCount FROM Category c WHERE c.id = ? LIMIT 1",
+    [id],
+  ).then((rows) => rows[0] ?? null)
+}
 
 /** PATCH /api/admin/categories/[id] — partial update. → { category } */
 export async function PATCH(req: Request, { params }: Params) {
@@ -32,39 +41,64 @@ export async function PATCH(req: Request, { params }: Params) {
   if (!parsed.success) return zodBadRequest(parsed.error)
   const d = parsed.data
 
-  const data: Prisma.CategoryUncheckedUpdateInput = {}
-  if (d.name !== undefined) data.name = d.name
-  if (d.slug !== undefined) data.slug = d.slug
-  if (d.description !== undefined) data.description = d.description
-  if (d.image !== undefined) data.image = d.image
-  if (d.icon !== undefined) data.icon = d.icon
-  if (d.featured !== undefined) data.featured = d.featured
-  if (d.sortOrder !== undefined) data.sortOrder = d.sortOrder
+  // Dynamic SET clause — only the provided fields (plus updatedAt) are written.
+  const sets: string[] = []
+  const values: unknown[] = []
+  if (d.name !== undefined) {
+    sets.push("name = ?")
+    values.push(d.name)
+  }
+  if (d.slug !== undefined) {
+    sets.push("slug = ?")
+    values.push(d.slug)
+  }
+  if (d.description !== undefined) {
+    sets.push("description = ?")
+    values.push(d.description)
+  }
+  if (d.image !== undefined) {
+    sets.push("image = ?")
+    values.push(d.image)
+  }
+  if (d.icon !== undefined) {
+    sets.push("icon = ?")
+    values.push(d.icon)
+  }
+  if (d.featured !== undefined) {
+    sets.push("featured = ?")
+    values.push(d.featured)
+  }
+  if (d.sortOrder !== undefined) {
+    sets.push("sortOrder = ?")
+    values.push(d.sortOrder)
+  }
 
   try {
     if (d.slug !== undefined) {
-      const clash = await withRetry(
-        () => db.category.findUnique({ where: { slug: d.slug }, select: { id: true } }),
+      const clashRows = await withRetry(
+        () => query<{ id: string }>("SELECT id FROM Category WHERE slug = ? LIMIT 1", [d.slug]),
         { label: "admin:categories:slug-check" },
       )
+      const clash = clashRows[0] ?? null
       if (clash && clash.id !== id) return badRequest("Slug already exists")
     }
 
-    const category = await withRetry(
+    await withRetry(
       () =>
-        db.category.update({
-          where: { id },
-          data,
-          include: { _count: { select: { products: true } } },
-        }),
+        execute(
+          `UPDATE Category SET ${[...sets, "updatedAt = CURRENT_TIMESTAMP(3)"].join(", ")} WHERE id = ?`,
+          [...values, id],
+        ),
       { label: "admin:categories:update" },
     )
 
+    const category = await withRetry(() => fetchCategory(id), { label: "admin:categories:get-updated" })
+    if (!category) return notFound("Category not found")
+
     cacheInvalidate("categories")
-    return NextResponse.json({ category: toAdminCategory(category) })
+    return NextResponse.json({ category: toAdminCategory({ ...category, productCount: Number(category.productCount) }) })
   } catch (err) {
-    if (prismaErrorCode(err) === "P2002") return badRequest("Slug already exists")
-    if (prismaErrorCode(err) === "P2025") return notFound("Category not found")
+    if (isDuplicateEntryError(err)) return badRequest("Slug already exists")
     return dbErrorResponse(err, "admin:categories:update")
   }
 }
@@ -80,19 +114,21 @@ export async function DELETE(req: Request, { params }: Params) {
   const { id } = await params
 
   try {
-    const productCount = await withRetry(
-      () => db.product.count({ where: { categoryId: id } }),
+    const countRows = await withRetry(
+      () => query<{ cnt: number }>("SELECT COUNT(*) AS cnt FROM Product WHERE categoryId = ?", [id]),
       { label: "admin:categories:count-products" },
     )
-    if (productCount > 0) {
+    if (Number(countRows[0]?.cnt ?? 0) > 0) {
       return NextResponse.json({ error: "Move or delete products first" }, { status: 400 })
     }
 
-    await withRetry(() => db.category.delete({ where: { id } }), { label: "admin:categories:delete" })
+    const res = await withRetry(() => execute("DELETE FROM Category WHERE id = ?", [id]), {
+      label: "admin:categories:delete",
+    })
+    if (res.affectedRows === 0) return notFound("Category not found")
     cacheInvalidate("categories")
     return NextResponse.json({ ok: true })
   } catch (err) {
-    if (prismaErrorCode(err) === "P2025") return notFound("Category not found")
     return dbErrorResponse(err, "admin:categories:delete")
   }
 }

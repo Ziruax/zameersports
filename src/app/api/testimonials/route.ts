@@ -1,4 +1,5 @@
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
+import type { TestimonialRow } from "@/lib/db-types"
 import { cacheGet, cacheSet } from "@/lib/cache"
 import { withRetry } from "@/lib/retry"
 import type { TestimonialDTO } from "@/lib/types"
@@ -19,7 +20,7 @@ export async function GET() {
 
   try {
     const rows = await withRetry(
-      () => db.testimonial.findMany({ where: { featured: true }, orderBy: { id: "desc" } }),
+      () => query<TestimonialRow>("SELECT * FROM Testimonial WHERE featured = 1 ORDER BY id DESC"),
       { label: "testimonials:list" },
     )
     const payload: TestimonialDTO[] = rows.map(toTestimonialDTO)

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
-import { db } from "@/lib/db"
+import { execute, isDuplicateEntryError, newId, query } from "@/lib/db"
+import type { CategoryRow } from "@/lib/db-types"
 import { cacheInvalidate } from "@/lib/cache"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../../_lib/helpers"
 import {
   badRequest,
-  prismaErrorCode,
   readJson,
   requireAdmin,
   unauthorized,
@@ -14,6 +14,8 @@ import {
 import { toAdminCategory } from "../_lib/mappers"
 import { CategoryCreateSchema } from "../_lib/schemas"
 import { slugify, uniqueCategorySlug } from "../_lib/slug"
+
+type CategoryCountRow = CategoryRow & { productCount: number }
 
 /**
  * GET /api/admin/categories — all categories ordered by sortOrder (then name),
@@ -26,13 +28,12 @@ export async function GET(req: Request) {
   try {
     const rows = await withRetry(
       () =>
-        db.category.findMany({
-          orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-          include: { _count: { select: { products: true } } },
-        }),
+        query<CategoryCountRow>(
+          "SELECT c.*, (SELECT COUNT(*) FROM Product p WHERE p.categoryId = c.id) AS productCount FROM Category c ORDER BY c.sortOrder ASC, c.name ASC",
+        ),
       { label: "admin:categories:list" },
     )
-    return NextResponse.json({ items: rows.map(toAdminCategory) })
+    return NextResponse.json({ items: rows.map((c) => toAdminCategory({ ...c, productCount: Number(c.productCount) })) })
   } catch (err) {
     return dbErrorResponse(err, "admin:categories:list")
   }
@@ -51,30 +52,44 @@ export async function POST(req: Request) {
   const d = parsed.data
 
   try {
-    // Explicit slug is used as-is (collisions → P2002 → 400 below);
+    // Explicit slug is used as-is (collisions → duplicate key → 400 below);
     // auto-derived slugs get -2/-3 suffixes until unique.
     const slug = d.slug !== undefined ? d.slug : await uniqueCategorySlug(slugify(d.name))
-    const category = await withRetry(
+    const id = newId()
+    await withRetry(
       () =>
-        db.category.create({
-          data: {
-            name: d.name,
+        execute(
+          "INSERT INTO Category (id, name, slug, description, image, icon, featured, sortOrder, updatedAt) VALUES (?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP(3))",
+          [
+            id,
+            d.name,
             slug,
-            description: d.description ?? "",
-            image: d.image ?? "",
-            icon: d.icon ?? "",
-            featured: d.featured ?? false,
-            sortOrder: d.sortOrder ?? 0,
-          },
-          include: { _count: { select: { products: true } } },
-        }),
+            d.description ?? "",
+            d.image ?? "",
+            d.icon ?? "",
+            d.featured ?? false,
+            d.sortOrder ?? 0,
+          ],
+        ),
       { label: "admin:categories:create" },
     )
 
+    const category = await withRetry(
+      () =>
+        query<CategoryCountRow>(
+          "SELECT c.*, (SELECT COUNT(*) FROM Product p WHERE p.categoryId = c.id) AS productCount FROM Category c WHERE c.id = ? LIMIT 1",
+          [id],
+        ).then((rows) => rows[0] ?? null),
+      { label: "admin:categories:get-created" },
+    )
+
     cacheInvalidate("categories")
-    return NextResponse.json({ category: toAdminCategory(category) }, { status: 201 })
+    return NextResponse.json(
+      { category: toAdminCategory({ ...category!, productCount: Number(category!.productCount) }) },
+      { status: 201 },
+    )
   } catch (err) {
-    if (prismaErrorCode(err) === "P2002") return badRequest("Slug already exists")
+    if (isDuplicateEntryError(err)) return badRequest("Slug already exists")
     return dbErrorResponse(err, "admin:categories:create")
   }
 }

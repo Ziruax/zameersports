@@ -1,6 +1,5 @@
-import { Prisma } from "@prisma/client"
 import { z } from "zod"
-import { db } from "@/lib/db"
+import { isDuplicateEntryError, newId, query, withTransaction } from "@/lib/db"
 import { cacheInvalidate } from "@/lib/cache"
 import { getSettings, getShippingInfo } from "@/lib/settings"
 import { withRetry } from "@/lib/retry"
@@ -24,6 +23,9 @@ const OrderSchema = z.object({
   items: z.array(OrderItemSchema).min(1, "Order must contain at least 1 item").max(20),
   couponCode: z.string().trim().max(30).optional(),
 })
+
+/** Thrown inside the order transaction when stock ran out between check and write. */
+class StockChangedError extends Error {}
 
 /**
  * POST /api/orders — place a COD order.
@@ -61,10 +63,10 @@ export async function POST(req: Request) {
     /* authoritative product data from DB */
     const products = await withRetry(
       () =>
-        db.product.findMany({
-          where: { id: { in: ids }, active: true },
-          select: { id: true, name: true, price: true, stock: true, images: true },
-        }),
+        query<{ id: string; name: string; price: number; stock: number; images: string }>(
+          "SELECT id, name, price, stock, images FROM Product WHERE active = 1 AND id IN (?)",
+          [ids],
+        ),
       { label: "orders:fetch-products" },
     )
     const byId = new Map(products.map((p) => [p.id, p]))
@@ -114,58 +116,44 @@ export async function POST(req: Request) {
     try {
       await withRetry(
         () =>
-          db.$transaction(
-            async (tx) => {
-              await tx.order.create({
-                data: {
-                  orderNumber,
-                  customerName,
-                  phone,
-                  email,
-                  address,
-                  city,
-                  notes,
-                  subtotal,
-                  discount,
-                  couponCode,
-                  shipping,
-                  total,
-                  paymentMethod: "cod",
-                  status: "pending",
-                  items: { create: lineItems },
-                },
-              })
-              for (const [id, qty] of qtyById) {
-                await tx.product.updateMany({
-                  where: { id },
-                  data: { stock: { decrement: qty }, sold: { increment: qty } },
-                })
+          withTransaction(async (conn) => {
+            const orderId = newId()
+            await conn.query(
+              "INSERT INTO `Order` (id, orderNumber, customerName, phone, email, address, city, notes, subtotal, discount, couponCode, shipping, total, paymentMethod, status, updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP(3))",
+              [orderId, orderNumber, customerName, phone, email, address, city, notes, subtotal, discount, couponCode, shipping, total, "cod", "pending"],
+            )
+            for (const item of lineItems) {
+              await conn.query(
+                "INSERT INTO OrderItem (id, orderId, productId, name, price, qty, image) VALUES (?,?,?,?,?,?,?)",
+                [newId(), orderId, item.productId, item.name, item.price, item.qty, item.image],
+              )
+            }
+            for (const [id, qty] of qtyById) {
+              const [res] = await conn.query(
+                "UPDATE Product SET stock = stock - ?, sold = sold + ?, updatedAt = CURRENT_TIMESTAMP(3) WHERE id = ? AND stock >= ?",
+                [qty, qty, id, qty],
+              )
+              if ((res as { affectedRows: number }).affectedRows !== 1) {
+                throw new StockChangedError(`Stock changed for a product in your cart. Please review your cart and try again.`)
               }
-              if (couponId) {
-                await tx.coupon.update({
-                  where: { id: couponId },
-                  data: { usedCount: { increment: 1 } },
-                })
-              }
-            },
-            /* Remote shared-hosting MySQL is slow; the default 5s interactive
-             * timeout expires mid-commit and surfaces as "Transaction already
-             * closed". 30s headroom keeps the atomic order write reliable. */
-            { timeout: 30_000, maxWait: 15_000 },
-          ),
+            }
+            if (couponId) {
+              await conn.query("UPDATE Coupon SET usedCount = usedCount + 1 WHERE id = ?", [couponId])
+            }
+          }),
         { label: "orders:create" },
       )
     } catch (txErr) {
       /* Rare double-commit: transaction committed but the connection dropped before
-       * the ack → the retry re-ran create and hit the orderNumber unique constraint.
+       * the ack → the retry re-ran the INSERT and hit the orderNumber unique key.
        * Treat as success and return the already-persisted order's totals. */
-      if (txErr instanceof Prisma.PrismaClientKnownRequestError && txErr.code === "P2002") {
+      if (isDuplicateEntryError(txErr)) {
         const existing = await withRetry(
           () =>
-            db.order.findUnique({
-              where: { orderNumber },
-              select: { orderNumber: true, subtotal: true, discount: true, shipping: true, total: true },
-            }),
+            query<{ orderNumber: string; subtotal: number; discount: number; shipping: number; total: number }>(
+              "SELECT orderNumber, subtotal, discount, shipping, total FROM `Order` WHERE orderNumber = ? LIMIT 1",
+              [orderNumber],
+            ).then((rows) => rows[0] ?? null),
           { label: "orders:find-existing" },
         )
         if (existing) {
@@ -174,6 +162,9 @@ export async function POST(req: Request) {
             { status: 201 },
           )
         }
+      }
+      if (txErr instanceof StockChangedError) {
+        return Response.json({ error: txErr.message }, { status: 400 })
       }
       throw txErr
     }

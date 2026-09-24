@@ -60,7 +60,7 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
               className="mt-2 h-11 bg-emerald-700 font-semibold text-white hover:bg-emerald-800"
             >
               <a
-                href="#/shop"
+                href="/shop"
                 onClick={closeDrawer}
                 aria-label="Start shopping, browse the full store"
               >
@@ -82,7 +82,7 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
                     />
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <a
-                        href={`#/product/${item.slug}`}
+                        href={`/product/${item.slug}`}
                         onClick={closeDrawer}
                         className="line-clamp-2 text-sm font-semibold text-neutral-900 hover:text-emerald-700"
                       >
@@ -142,12 +142,12 @@ export default function CartDrawer({ settings }: CartDrawerProps) {
                   asChild
                   className="h-11 w-full bg-emerald-700 font-semibold text-white hover:bg-emerald-800"
                 >
-                  <a href="#/checkout" onClick={closeDrawer} aria-label="Go to checkout">
+                  <a href="/checkout" onClick={closeDrawer} aria-label="Go to checkout">
                     Checkout
                   </a>
                 </Button>
                 <Button asChild variant="outline" className="h-11 w-full font-semibold">
-                  <a href="#/cart" onClick={closeDrawer} aria-label="View full cart">
+                  <a href="/cart" onClick={closeDrawer} aria-label="View full cart">
                     View Cart
                   </a>
                 </Button>

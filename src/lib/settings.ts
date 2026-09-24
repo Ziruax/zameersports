@@ -1,4 +1,5 @@
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
+import type { SettingRow } from "@/lib/db-types"
 import { cacheGet, cacheSet } from "@/lib/cache"
 
 export type SettingsMap = Record<string, string>
@@ -31,7 +32,7 @@ export async function getSettings(): Promise<SettingsMap> {
   const cached = cacheGet<SettingsMap>(CACHE_KEY)
   if (cached) return cached
   try {
-    const rows = await db.setting.findMany()
+    const rows = await query<SettingRow>("SELECT `key`, `value` FROM Setting")
     const map: SettingsMap = { ...DEFAULTS }
     for (const row of rows) map[row.key] = row.value
     cacheSet(CACHE_KEY, map)

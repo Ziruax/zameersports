@@ -79,6 +79,8 @@ export interface AdminProductFull extends AdminProduct {
   images: string[];
   tags: string[];
   specs: Record<string, string>;
+  metaTitle: string;
+  metaDescription: string;
   updatedAt: string;
 }
 

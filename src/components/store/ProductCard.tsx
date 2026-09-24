@@ -100,7 +100,7 @@ export default function ProductCard({ product }: { product: ProductListItem }) {
           {product.brand}
         </p>
         <a
-          href={`#/product/${product.slug}`}
+          href={`/product/${product.slug}`}
           className="line-clamp-2 text-sm font-semibold leading-relaxed text-neutral-900 hover:text-emerald-700"
         >
           {product.name}

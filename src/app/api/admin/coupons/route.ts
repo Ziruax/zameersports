@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { db } from "@/lib/db"
+import { execute, isDuplicateEntryError, newId, query } from "@/lib/db"
+import type { CouponRow } from "@/lib/db-types"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../../_lib/helpers"
 import {
   badRequest,
-  prismaErrorCode,
   readJson,
   requireAdmin,
   unauthorized,
@@ -13,18 +13,7 @@ import {
 } from "../_lib/guard"
 import { normalizeCode } from "@/lib/coupon"
 
-function serialize(c: {
-  id: string
-  code: string
-  type: string
-  value: number
-  minOrder: number
-  active: boolean
-  usageLimit: number
-  usedCount: number
-  expiresAt: Date | null
-  createdAt: Date
-}) {
+function serialize(c: CouponRow) {
   return {
     id: c.id,
     code: c.code,
@@ -47,10 +36,9 @@ export async function GET(req: Request) {
   if (!admin) return unauthorized()
 
   try {
-    const rows = await withRetry(
-      () => db.coupon.findMany({ orderBy: { createdAt: "desc" } }),
-      { label: "admin:coupons:list" },
-    )
+    const rows = await withRetry(() => query<CouponRow>("SELECT * FROM Coupon ORDER BY createdAt DESC"), {
+      label: "admin:coupons:list",
+    })
     return NextResponse.json({ items: rows.map(serialize) })
   } catch (err) {
     return dbErrorResponse(err, "admin:coupons:list")
@@ -85,25 +73,32 @@ export async function POST(req: Request) {
   const d = parsed.data
 
   try {
-    const coupon = await withRetry(
+    const id = newId()
+    await withRetry(
       () =>
-        db.coupon.create({
-          data: {
-            code: normalizeCode(d.code),
-            type: d.type,
-            value: d.value,
-            minOrder: d.minOrder,
-            usageLimit: d.usageLimit,
-            active: d.active,
-            expiresAt: d.expiresAt ? new Date(d.expiresAt) : null,
-          },
-        }),
+        execute(
+          "INSERT INTO Coupon (id, code, type, `value`, minOrder, usageLimit, active, expiresAt) VALUES (?,?,?,?,?,?,?,?)",
+          [
+            id,
+            normalizeCode(d.code),
+            d.type,
+            d.value,
+            d.minOrder,
+            d.usageLimit,
+            d.active,
+            d.expiresAt ? new Date(d.expiresAt) : null, // mysql2 binds Date/null natively
+          ],
+        ),
       { label: "admin:coupons:create" },
     )
-    return NextResponse.json({ coupon: serialize(coupon) }, { status: 201 })
+
+    const coupon = await withRetry(
+      () => query<CouponRow>("SELECT * FROM Coupon WHERE id = ? LIMIT 1", [id]).then((rows) => rows[0] ?? null),
+      { label: "admin:coupons:get-created" },
+    )
+    return NextResponse.json({ coupon: serialize(coupon!) }, { status: 201 })
   } catch (err) {
-    const prisma = prismaErrorCode(err)
-    if (prisma === "P2002") {
+    if (isDuplicateEntryError(err)) {
       return badRequest("A coupon with this code already exists.")
     }
     return dbErrorResponse(err, "admin:coupons:create")

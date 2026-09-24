@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { db } from "@/lib/db"
+import { execute, query } from "@/lib/db"
+import type { ContactMessageRow } from "@/lib/db-types"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../../../_lib/helpers"
-import { notFound, prismaErrorCode, readJson, requireAdmin, unauthorized, zodBadRequest } from "../../_lib/guard"
+import { notFound, readJson, requireAdmin, unauthorized, zodBadRequest } from "../../_lib/guard"
 import { toAdminMessage } from "../../_lib/mappers"
 
 type Params = { params: Promise<{ id: string }> }
@@ -26,13 +27,22 @@ export async function PATCH(req: Request, { params }: Params) {
   if (!parsed.success) return zodBadRequest(parsed.error)
 
   try {
-    const message = await withRetry(
-      () => db.contactMessage.update({ where: { id }, data: { read: parsed.data.read } }),
+    await withRetry(
+      // `read` is a MySQL reserved word — backticked
+      () => execute("UPDATE ContactMessage SET `read` = ? WHERE id = ?", [parsed.data.read, id]),
       { label: "admin:messages:update" },
     )
+
+    const message = await withRetry(
+      () =>
+        query<ContactMessageRow>("SELECT * FROM ContactMessage WHERE id = ? LIMIT 1", [id]).then(
+          (rows) => rows[0] ?? null,
+        ),
+      { label: "admin:messages:get-updated" },
+    )
+    if (!message) return notFound("Message not found")
     return NextResponse.json({ ok: true, message: toAdminMessage(message) })
   } catch (err) {
-    if (prismaErrorCode(err) === "P2025") return notFound("Message not found")
     return dbErrorResponse(err, "admin:messages:update")
   }
 }
@@ -45,10 +55,12 @@ export async function DELETE(req: Request, { params }: Params) {
   const { id } = await params
 
   try {
-    await withRetry(() => db.contactMessage.delete({ where: { id } }), { label: "admin:messages:delete" })
+    const res = await withRetry(() => execute("DELETE FROM ContactMessage WHERE id = ?", [id]), {
+      label: "admin:messages:delete",
+    })
+    if (res.affectedRows === 0) return notFound("Message not found")
     return NextResponse.json({ ok: true })
   } catch (err) {
-    if (prismaErrorCode(err) === "P2025") return notFound("Message not found")
     return dbErrorResponse(err, "admin:messages:delete")
   }
 }

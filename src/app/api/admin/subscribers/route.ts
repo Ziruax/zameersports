@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
+import type { SubscriberRow } from "@/lib/db-types"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../../_lib/helpers"
 import { requireAdmin, unauthorized } from "../_lib/guard"
@@ -10,10 +11,9 @@ export async function GET(req: Request) {
   if (!admin) return unauthorized()
 
   try {
-    const rows = await withRetry(
-      () => db.subscriber.findMany({ orderBy: { createdAt: "desc" } }),
-      { label: "admin:subscribers:list" },
-    )
+    const rows = await withRetry(() => query<SubscriberRow>("SELECT * FROM Subscriber ORDER BY createdAt DESC"), {
+      label: "admin:subscribers:list",
+    })
     return NextResponse.json({
       items: rows.map((s) => ({ id: s.id, email: s.email, createdAt: s.createdAt.toISOString() })),
     })

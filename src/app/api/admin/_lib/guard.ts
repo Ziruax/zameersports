@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
-import { Prisma } from "@prisma/client"
 import type { ZodError } from "zod"
+import { isDuplicateEntryError } from "@/lib/db"
 import { verifyToken } from "@/lib/auth"
 
 /**
@@ -73,8 +73,13 @@ export function zodBadRequest(err: ZodError): NextResponse {
   return NextResponse.json({ error: err.issues[0]?.message ?? "Invalid input" }, { status: 400 })
 }
 
-/** Extract a Prisma known-error code (e.g. "P2002" unique, "P2025" not found), or null. */
+/** True when MySQL rejected a duplicate unique key (e.g. slug already exists). */
+export function isDuplicateEntry(err: unknown): boolean {
+  return isDuplicateEntryError(err)
+}
+
+/** Back-compat: maps a MySQL duplicate-key error to the historical Prisma P2002 code. */
 export function prismaErrorCode(err: unknown): string | null {
-  if (err instanceof Prisma.PrismaClientKnownRequestError) return err.code
+  if (isDuplicateEntryError(err)) return "P2002"
   return null
 }

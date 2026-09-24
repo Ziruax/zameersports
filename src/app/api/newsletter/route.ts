@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { db } from "@/lib/db"
+import { execute, newId } from "@/lib/db"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../_lib/helpers"
 
@@ -24,11 +24,10 @@ export async function POST(req: Request) {
   try {
     await withRetry(
       () =>
-        db.subscriber.upsert({
-          where: { email: parsed.data.email },
-          create: { email: parsed.data.email },
-          update: { email: parsed.data.email },
-        }),
+        execute(
+          "INSERT INTO Subscriber (id, email) VALUES (?, ?) ON DUPLICATE KEY UPDATE email = VALUES(email)",
+          [newId(), parsed.data.email],
+        ),
       { label: "newsletter:upsert" },
     )
     return Response.json({ ok: true }, { status: 201 })

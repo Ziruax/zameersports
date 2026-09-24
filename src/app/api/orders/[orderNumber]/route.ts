@@ -1,4 +1,5 @@
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
+import type { OrderItemRow, OrderRow } from "@/lib/db-types"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse, toOrderDTO } from "../../_lib/helpers"
 
@@ -20,8 +21,18 @@ export async function GET(req: Request, { params }: { params: Promise<{ orderNum
   }
 
   try {
+    /* Prisma findUnique({ include: { items: true } }) → Order + its OrderItems */
     const order = await withRetry(
-      () => db.order.findUnique({ where: { orderNumber }, include: { items: true } }),
+      async () => {
+        const rows = await query<OrderRow>(
+          "SELECT * FROM `Order` WHERE orderNumber = ? LIMIT 1",
+          [orderNumber],
+        )
+        const o = rows[0] ?? null
+        if (!o) return null
+        const items = await query<OrderItemRow>("SELECT * FROM OrderItem WHERE orderId = ?", [o.id])
+        return { ...o, items }
+      },
       { label: "orders:track" },
     )
     if (!order) {
@@ -30,6 +41,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ orderNum
     const orderDigits = last10Digits(order.phone)
     if (!orderDigits || orderDigits !== last10Digits(phone)) {
       return Response.json({ error: "Order not found" }, { status: 404 })
+    }
+    /* Defensive: updatedAt has no DB default (Prisma set it client-side), so
+     * rows written by INSERTs that omit it carry the MySQL zero-date, which
+     * parses as an Invalid Date. Treat those as "never updated" (createdAt). */
+    if (Number.isNaN(order.updatedAt.getTime())) {
+      order.updatedAt = order.createdAt
     }
     /* OrderDTO + updatedAt (extra timeline timestamp for the tracking UI) */
     return Response.json(toOrderDTO(order))

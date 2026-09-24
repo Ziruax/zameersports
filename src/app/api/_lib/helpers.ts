@@ -3,7 +3,14 @@
  * uniform error responder (503 on transient DB failure after retries, 500
  * otherwise). Private folder — not routable.
  */
-import type { Category, Order, OrderItem, Product, Review, Testimonial } from "@prisma/client"
+import type {
+  CategoryRow,
+  OrderRow,
+  OrderItemRow,
+  ProductRow,
+  ReviewRow,
+  TestimonialRow,
+} from "@/lib/db-types"
 import type { CategoryDTO, OrderDTO, OrderItemDTO, ProductListItem, ReviewDTO, TestimonialDTO } from "@/lib/types"
 import { isTransientDbError } from "@/lib/retry"
 
@@ -50,8 +57,8 @@ export function parseTags(tags: string): string[] {
     .filter(Boolean)
 }
 
-/** Map a Prisma Product row → ProductListItem DTO (types.ts shape, exact). */
-export function toListItem(p: Product): ProductListItem {
+/** Map a Product row → ProductListItem DTO (types.ts shape, exact). */
+export function toListItem(p: ProductRow): ProductListItem {
   return {
     id: p.id,
     slug: p.slug,
@@ -70,8 +77,8 @@ export function toListItem(p: Product): ProductListItem {
   }
 }
 
-/** Map a Prisma Category row (+ pre-computed product count) → CategoryDTO. */
-export function toCategoryDTO(c: Category, productCount: number): CategoryDTO {
+/** Map a Category row (+ pre-computed product count) → CategoryDTO. */
+export function toCategoryDTO(c: CategoryRow, productCount: number): CategoryDTO {
   return {
     id: c.id,
     slug: c.slug,
@@ -85,13 +92,13 @@ export function toCategoryDTO(c: Category, productCount: number): CategoryDTO {
   }
 }
 
-/** Map a Prisma Testimonial row → TestimonialDTO. */
-export function toTestimonialDTO(t: Testimonial): TestimonialDTO {
+/** Map a Testimonial row → TestimonialDTO. */
+export function toTestimonialDTO(t: TestimonialRow): TestimonialDTO {
   return { id: t.id, name: t.name, location: t.location, text: t.text, rating: t.rating, image: t.image }
 }
 
-/** Map a Prisma Review row → ReviewDTO (createdAt as ISO string). */
-export function toReviewDTO(r: Review): ReviewDTO {
+/** Map a Review row → ReviewDTO (createdAt as ISO string). */
+export function toReviewDTO(r: ReviewRow): ReviewDTO {
   return {
     id: r.id,
     name: r.name,
@@ -101,8 +108,8 @@ export function toReviewDTO(r: Review): ReviewDTO {
   }
 }
 
-/** Map a Prisma Order (+ items) → OrderDTO (ISO timestamps). */
-export function toOrderDTO(o: Order & { items: OrderItem[] }): OrderDTO & { updatedAt: string } {
+/** Map an Order (+ items) → OrderDTO (ISO timestamps). */
+export function toOrderDTO(o: OrderRow & { items: OrderItemRow[] }): OrderDTO & { updatedAt: string } {
   return {
     orderNumber: o.orderNumber,
     customerName: o.customerName,

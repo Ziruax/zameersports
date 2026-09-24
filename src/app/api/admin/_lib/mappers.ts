@@ -1,14 +1,25 @@
-import type { Category, ContactMessage, Order, OrderItem, Product, Review } from "@prisma/client"
+import type {
+  CategoryRow,
+  ContactMessageRow,
+  OrderRow,
+  OrderItemRow,
+  ProductRow,
+  ReviewRow,
+} from "@/lib/db-types"
 import { firstImage, parseImages, parseSpecs, parseTags, toCategoryDTO } from "../../_lib/helpers"
 
 /**
  * Admin-specific DTO mappers (fuller than the public storefront DTOs).
+ * Rows come from raw SQL — JOIN columns arrive FLAT on the row:
+ *   products  → { ...ProductRow, categoryName }   (LEFT JOIN Category)
+ *   reviews   → { ...ReviewRow, productName }     (LEFT JOIN Product)
+ *   categories→ { ...CategoryRow, productCount }  (subquery COUNT)
  * Private folder — not routable.
  */
 
-type ProductWithCategory = Product & { category: { id: string; name: string } | null }
-type ReviewWithProduct = Review & { product: { name: string } | null }
-type OrderWithItems = Order & { items: OrderItem[] }
+type ProductWithCategory = ProductRow & { categoryName?: string | null }
+type ReviewWithProduct = ReviewRow & { productName?: string | null }
+type OrderWithItems = OrderRow & { items: OrderItemRow[] }
 
 export interface AdminProductRow {
   id: string
@@ -46,7 +57,7 @@ export function toAdminProductRow(p: ProductWithCategory): AdminProductRow {
     featured: p.featured,
     isNew: p.isNew,
     active: p.active,
-    categoryName: p.category?.name ?? "",
+    categoryName: p.categoryName ?? "",
     categoryId: p.categoryId,
     sold: p.sold,
     rating: p.rating,
@@ -61,6 +72,8 @@ export interface AdminProductFull extends AdminProductRow {
   images: string[]
   tags: string[]
   specs: Record<string, string>
+  metaTitle: string
+  metaDescription: string
   updatedAt: string
 }
 
@@ -73,6 +86,8 @@ export function toAdminProductFull(p: ProductWithCategory): AdminProductFull {
     images: parseImages(p.images),
     tags: parseTags(p.tags),
     specs: parseSpecs(p.specs),
+    metaTitle: p.metaTitle,
+    metaDescription: p.metaDescription,
     updatedAt: p.updatedAt.toISOString(),
   }
 }
@@ -155,7 +170,7 @@ export function toAdminReview(r: ReviewWithProduct): AdminReview {
   return {
     id: r.id,
     productId: r.productId,
-    productName: r.product?.name ?? "",
+    productName: r.productName ?? "",
     name: r.name,
     rating: r.rating,
     comment: r.comment,
@@ -175,7 +190,7 @@ export interface AdminMessage {
   createdAt: string
 }
 
-export function toAdminMessage(m: ContactMessage): AdminMessage {
+export function toAdminMessage(m: ContactMessageRow): AdminMessage {
   return {
     id: m.id,
     name: m.name,
@@ -191,6 +206,6 @@ export function toAdminMessage(m: ContactMessage): AdminMessage {
 export type AdminCategory = ReturnType<typeof toAdminCategory>
 
 /** Category row for admin (productCount includes inactive products — blocks deletion). */
-export function toAdminCategory(c: Category & { _count: { products: number } }) {
-  return toCategoryDTO(c, c._count.products)
+export function toAdminCategory(c: CategoryRow & { productCount: number }) {
+  return toCategoryDTO(c, c.productCount)
 }

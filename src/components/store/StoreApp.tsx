@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { useHashRoute } from "@/hooks/use-hash-route";
+import { usePathRoute } from "@/hooks/use-path-route";
 import { useCartStore } from "@/lib/cart-store";
 import type { StoreInitialData } from "@/lib/types";
 import AdminApp from "@/components/admin/AdminApp";
@@ -33,12 +33,40 @@ export default function StoreApp({ initialData }: { initialData: StoreInitialDat
       }),
   );
 
-  const { route } = useHashRoute();
+  const { route, navigate } = usePathRoute();
 
   // Rehydrate persisted cart (zustand persist uses skipHydration).
   useEffect(() => {
     void useCartStore.persist.rehydrate();
   }, []);
+
+  // Global click interceptor: turn clicks on internal <a href="/..."> links
+  // into SPA navigations (pushState) instead of full page reloads. Skips
+  // external/protocol links, new tabs, modifier clicks, downloads and file
+  // assets so those keep their default browser behaviour.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const anchor = (e.target as HTMLElement | null)?.closest("a");
+      if (!anchor) return;
+      if (anchor.target && anchor.target !== "_self") return;
+      if (anchor.hasAttribute("download")) return;
+      const href = anchor.getAttribute("href");
+      if (!href || !href.startsWith("/") || href.startsWith("//")) return;
+      if (
+        href.startsWith("/api/") ||
+        href.startsWith("/uploads/") ||
+        href.startsWith("/images/")
+      ) {
+        return;
+      }
+      e.preventDefault();
+      navigate(href);
+    };
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, [navigate]);
 
   // Scroll to top whenever the route changes.
   useEffect(() => {

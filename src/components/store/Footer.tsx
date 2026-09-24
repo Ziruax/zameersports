@@ -8,11 +8,11 @@ interface FooterProps {
 }
 
 const quickLinks = [
-  { label: "Home", href: "#/" },
-  { label: "Track Order", href: "#/track" },
-  { label: "About Us", href: "#/about" },
-  { label: "Contact", href: "#/contact" },
-  { label: "Admin", href: "#/admin" },
+  { label: "Home", href: "/" },
+  { label: "Track Order", href: "/track" },
+  { label: "About Us", href: "/about" },
+  { label: "Contact", href: "/contact" },
+  { label: "Admin", href: "/admin" },
 ];
 
 /** Dark neutral footer with brand block, shop links, quick links and contact info. */
@@ -73,7 +73,7 @@ export default function Footer({ categories, settings }: FooterProps) {
             {categories.map((cat) => (
               <li key={cat.id}>
                 <a
-                  href={`#/shop?category=${cat.slug}`}
+                  href={`/shop?category=${cat.slug}`}
                   className="text-sm text-neutral-400 transition-colors hover:text-amber-500"
                 >
                   {cat.name}

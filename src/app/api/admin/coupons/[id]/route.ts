@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { db } from "@/lib/db"
+import { execute, isDuplicateEntryError, query } from "@/lib/db"
+import type { CouponRow } from "@/lib/db-types"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../../../_lib/helpers"
 import {
   badRequest,
   notFound,
-  prismaErrorCode,
   readJson,
   requireAdmin,
   unauthorized,
@@ -31,18 +31,7 @@ const CouponUpdateSchema = z
     path: ["value"],
   })
 
-function serialize(c: {
-  id: string
-  code: string
-  type: string
-  value: number
-  minOrder: number
-  active: boolean
-  usageLimit: number
-  usedCount: number
-  expiresAt: Date | null
-  createdAt: Date
-}) {
+function serialize(c: CouponRow) {
   return {
     id: c.id,
     code: c.code,
@@ -70,31 +59,55 @@ export async function PATCH(req: Request, ctx: RouteContext) {
   const d = parsed.data
   const { id } = await ctx.params
 
-  const data: Record<string, unknown> = {}
-  if (d.code !== undefined) data.code = normalizeCode(d.code)
-  if (d.type !== undefined) data.type = d.type
-  if (d.value !== undefined) data.value = d.value
-  if (d.minOrder !== undefined) data.minOrder = d.minOrder
-  if (d.usageLimit !== undefined) data.usageLimit = d.usageLimit
-  if (d.active !== undefined) data.active = d.active
+  // Dynamic SET clause — only the provided fields are written (Coupon has no updatedAt).
+  const sets: string[] = []
+  const values: unknown[] = []
+  if (d.code !== undefined) {
+    sets.push("code = ?")
+    values.push(normalizeCode(d.code))
+  }
+  if (d.type !== undefined) {
+    sets.push("type = ?")
+    values.push(d.type)
+  }
+  if (d.value !== undefined) {
+    sets.push("`value` = ?")
+    values.push(d.value)
+  }
+  if (d.minOrder !== undefined) {
+    sets.push("minOrder = ?")
+    values.push(d.minOrder)
+  }
+  if (d.usageLimit !== undefined) {
+    sets.push("usageLimit = ?")
+    values.push(d.usageLimit)
+  }
+  if (d.active !== undefined) {
+    sets.push("active = ?")
+    values.push(d.active)
+  }
   if (d.expiresAt !== undefined) {
-    data.expiresAt = d.expiresAt ? new Date(d.expiresAt) : null
+    sets.push("expiresAt = ?")
+    values.push(d.expiresAt ? new Date(d.expiresAt) : null)
   }
 
-  if (Object.keys(data).length === 0) {
+  if (sets.length === 0) {
     return badRequest("Nothing to update.")
   }
 
   try {
+    await withRetry(() => execute(`UPDATE Coupon SET ${sets.join(", ")} WHERE id = ?`, [...values, id]), {
+      label: "admin:coupons:update",
+    })
+
     const coupon = await withRetry(
-      () => db.coupon.update({ where: { id }, data }),
-      { label: "admin:coupons:update" },
+      () => query<CouponRow>("SELECT * FROM Coupon WHERE id = ? LIMIT 1", [id]).then((rows) => rows[0] ?? null),
+      { label: "admin:coupons:get-updated" },
     )
+    if (!coupon) return notFound("Coupon not found.")
     return NextResponse.json({ coupon: serialize(coupon) })
   } catch (err) {
-    const prisma = prismaErrorCode(err)
-    if (prisma === "P2025") return notFound("Coupon not found.")
-    if (prisma === "P2002") return badRequest("A coupon with this code already exists.")
+    if (isDuplicateEntryError(err)) return badRequest("A coupon with this code already exists.")
     return dbErrorResponse(err, "admin:coupons:update")
   }
 }
@@ -106,13 +119,12 @@ export async function DELETE(req: Request, ctx: RouteContext) {
 
   const { id } = await ctx.params
   try {
-    await withRetry(() => db.coupon.delete({ where: { id } }), {
+    const res = await withRetry(() => execute("DELETE FROM Coupon WHERE id = ?", [id]), {
       label: "admin:coupons:delete",
     })
+    if (res.affectedRows === 0) return notFound("Coupon not found.")
     return NextResponse.json({ ok: true })
   } catch (err) {
-    const prisma = prismaErrorCode(err)
-    if (prisma === "P2025") return notFound("Coupon not found.")
     return dbErrorResponse(err, "admin:coupons:delete")
   }
 }

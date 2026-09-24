@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import SectionHeading from "../SectionHeading";
 import { useOrderTracking, useSettings, waLink, type TrackedOrder } from "@/hooks/use-checkout";
-import { useHashRoute } from "@/hooks/use-hash-route";
+import { usePathRoute } from "@/hooks/use-path-route";
 import { ApiError } from "@/lib/api";
 import { formatDate, formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -250,7 +250,7 @@ function OrderCard({ order }: { order: TrackedOrder }) {
  * which prefills the order number without effects or cascading renders.
  */
 export default function TrackView() {
-  const { route } = useHashRoute();
+  const { route } = usePathRoute();
 
   useEffect(() => {
     document.title = "Track Order | Zameer Sports";

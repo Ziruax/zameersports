@@ -1,18 +1,9 @@
-import { db } from "@/lib/db"
+import { query } from "@/lib/db"
+import type { CouponRow } from "@/lib/db-types"
 import { withRetry } from "@/lib/retry"
 
 /** Coupon shapes used by both the public validate endpoint and admin CRUD. */
-export interface CouponRow {
-  id: string
-  code: string
-  type: string
-  value: number
-  minOrder: number
-  active: boolean
-  usageLimit: number
-  usedCount: number
-  expiresAt: Date | null
-}
+export type { CouponRow }
 
 export interface CouponCheck {
   ok: boolean
@@ -51,7 +42,7 @@ export async function checkCoupon(code: string, subtotal: number): Promise<Coupo
   if (!normalized) return { ok: false, reason: "notFound" }
 
   const coupon = await withRetry(
-    () => db.coupon.findUnique({ where: { code: normalized } }),
+    () => query<CouponRow>("SELECT * FROM Coupon WHERE code = ? LIMIT 1", [normalized]).then((rows) => rows[0] ?? null),
     { label: "coupon:check" },
   )
   if (!coupon) return { ok: false, reason: "notFound" }

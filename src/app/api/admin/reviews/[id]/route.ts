@@ -1,39 +1,42 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import { db } from "@/lib/db"
+import type { mysql } from "@/lib/db"
+import { query, withTransaction } from "@/lib/db"
+import type { ReviewRow } from "@/lib/db-types"
 import { cacheInvalidate } from "@/lib/cache"
 import { withRetry } from "@/lib/retry"
 import { dbErrorResponse } from "../../../_lib/helpers"
-import { notFound, prismaErrorCode, readJson, requireAdmin, unauthorized, zodBadRequest } from "../../_lib/guard"
+import { notFound, readJson, requireAdmin, unauthorized, zodBadRequest } from "../../_lib/guard"
 import { toAdminReview } from "../../_lib/mappers"
 
 type Params = { params: Promise<{ id: string }> }
+
+type ReviewJoinRow = ReviewRow & { productName: string | null }
 
 const ReviewApproveSchema = z.object({
   approved: z.boolean(),
 })
 
-/** Recalculate the product's rating (avg of approved reviews, 1 decimal) and reviewCount. */
-async function recalcProductRating(productId: string): Promise<void> {
-  const agg = await withRetry(
-    () =>
-      db.review.aggregate({
-        where: { productId, approved: true },
-        _avg: { rating: true },
-        _count: true,
-      }),
-    { label: "admin:reviews:aggregate" },
+/** Typed query on an existing transaction connection. */
+async function q<T>(conn: mysql.PoolConnection, sql: string, params: unknown[] = []): Promise<T[]> {
+  const [rows] = await conn.query(sql, params)
+  return rows as T[]
+}
+
+/**
+ * Recalculate the product's rating (avg of approved reviews, 1 decimal) and
+ * reviewCount. Runs on the given transaction connection.
+ */
+async function recalcProductRating(conn: mysql.PoolConnection, productId: string): Promise<void> {
+  const aggRows = await q<{ avgRating: number; cnt: number }>(
+    conn,
+    "SELECT COALESCE(AVG(rating), 0) AS avgRating, COUNT(*) AS cnt FROM Review WHERE productId = ? AND approved = 1",
+    [productId],
   )
-  await withRetry(
-    () =>
-      db.product.update({
-        where: { id: productId },
-        data: {
-          rating: Math.round((agg._avg.rating ?? 0) * 10) / 10,
-          reviewCount: agg._count,
-        },
-      }),
-    { label: "admin:reviews:recalc" },
+  const agg = aggRows[0]
+  await conn.query(
+    "UPDATE Product SET rating = ?, reviewCount = ?, updatedAt = CURRENT_TIMESTAMP(3) WHERE id = ?",
+    [Math.round(Number(agg?.avgRating ?? 0) * 10) / 10, Number(agg?.cnt ?? 0), productId],
   )
 }
 
@@ -53,19 +56,25 @@ export async function PATCH(req: Request, { params }: Params) {
   try {
     const review = await withRetry(
       () =>
-        db.review.update({
-          where: { id },
-          data: { approved: parsed.data.approved },
-          include: { product: { select: { name: true } } },
+        withTransaction(async (conn) => {
+          await conn.query("UPDATE Review SET approved = ? WHERE id = ?", [parsed.data.approved, id])
+          const rows = await q<ReviewJoinRow>(
+            conn,
+            "SELECT r.*, p.name AS productName FROM Review r LEFT JOIN Product p ON p.id = r.productId WHERE r.id = ? LIMIT 1",
+            [id],
+          )
+          const review = rows[0] ?? null
+          if (!review) return null
+          await recalcProductRating(conn, review.productId)
+          return review
         }),
       { label: "admin:reviews:update" },
     )
 
-    await recalcProductRating(review.productId)
+    if (!review) return notFound("Review not found")
     cacheInvalidate("products")
     return NextResponse.json({ ok: true, review: toAdminReview(review) })
   } catch (err) {
-    if (prismaErrorCode(err) === "P2025") return notFound("Review not found")
     return dbErrorResponse(err, "admin:reviews:update")
   }
 }
@@ -78,18 +87,24 @@ export async function DELETE(req: Request, { params }: Params) {
   const { id } = await params
 
   try {
-    const existing = await withRetry(
-      () => db.review.findUnique({ where: { id }, select: { id: true, productId: true } }),
+    const existingRows = await withRetry(
+      () => query<{ id: string; productId: string }>("SELECT id, productId FROM Review WHERE id = ? LIMIT 1", [id]),
       { label: "admin:reviews:find" },
     )
+    const existing = existingRows[0] ?? null
     if (!existing) return notFound("Review not found")
 
-    await withRetry(() => db.review.delete({ where: { id } }), { label: "admin:reviews:delete" })
-    await recalcProductRating(existing.productId)
+    await withRetry(
+      () =>
+        withTransaction(async (conn) => {
+          await conn.query("DELETE FROM Review WHERE id = ?", [id])
+          await recalcProductRating(conn, existing.productId)
+        }),
+      { label: "admin:reviews:delete" },
+    )
     cacheInvalidate("products")
     return NextResponse.json({ ok: true })
   } catch (err) {
-    if (prismaErrorCode(err) === "P2025") return notFound("Review not found")
     return dbErrorResponse(err, "admin:reviews:delete")
   }
 }

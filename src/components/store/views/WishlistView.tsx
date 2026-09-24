@@ -35,7 +35,7 @@ function useAllProducts() {
   });
 }
 
-/** Saved-items view (#/wishlist): hearts collected from product cards. */
+/** Saved-items view (/wishlist): hearts collected from product cards. */
 export default function WishlistView() {
   const { slugs } = useWishlist();
   const all = useAllProducts();
@@ -67,7 +67,7 @@ export default function WishlistView() {
         </div>
         {slugs.length > 0 ? (
           <Button asChild variant="outline" className="h-11 font-semibold">
-            <a href="#/shop">Continue Shopping</a>
+            <a href="/shop">Continue Shopping</a>
           </Button>
         ) : null}
       </div>
@@ -93,7 +93,7 @@ export default function WishlistView() {
               </p>
             </div>
             <Button asChild className="h-11 px-8 font-semibold">
-              <a href="#/shop">
+              <a href="/shop">
                 <ShoppingBag className="size-4" aria-hidden="true" />
                 Browse the Shop
               </a>

@@ -1,9 +1,18 @@
 /**
  * Idempotent seed script for ZameerSports.shop (bun runtime, remote MySQL).
- * Usage: cd /home/z/my-project && unset DATABASE_URL && bun scripts/seed.ts
+ * Usage: cd /home/z/my-project && env -u DATABASE_URL bun scripts/seed.ts
+ *   (the sandbox shell exports a stale DATABASE_URL; the project .env is correct)
+ *
+ * Seeding is a dev-time operation using Prisma (devDependency). Run
+ * `bun run db:generate` once after install. Production runtime uses raw
+ * mysql2 (src/lib/db.ts) — no Prisma needed on the server.
  *
  * Upserts by slug/email/key; skips rows that already exist (testimonials,
- * reviews, demo orders). Safe to re-run.
+ * reviews, demo orders). Safe to re-run — but note the product upsert
+ * restores catalog stock/sold/rating values (dev/demo use).
+ *
+ * This script creates its own PrismaClient directly — do NOT import the
+ * `db` object from "@/lib/db" (that is the runtime mysql2 pool now).
  */
 import { PrismaClient } from "@prisma/client"
 import { randomBytes, scryptSync } from "crypto"

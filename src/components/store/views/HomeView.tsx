@@ -183,14 +183,14 @@ function HeroCarousel() {
                   asChild
                   className="h-12 bg-emerald-600 px-7 text-sm font-bold uppercase tracking-wide text-white hover:bg-emerald-500"
                 >
-                  <a href="#/shop?category=cricket">Shop Cricket</a>
+                  <a href="/shop?category=cricket">Shop Cricket</a>
                 </Button>
                 <Button
                   asChild
                   variant="outline"
                   className="h-12 border-white/70 bg-transparent px-7 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10 hover:text-white"
                 >
-                  <a href="#/shop">Browse All</a>
+                  <a href="/shop">Browse All</a>
                 </Button>
               </div>
             </motion.div>
@@ -526,7 +526,7 @@ export default function HomeView({ initialData }: { initialData: StoreInitialDat
               return (
                 <a
                   key={cat.id}
-                  href={`#/shop?category=${cat.slug}`}
+                  href={`/shop?category=${cat.slug}`}
                   className="group relative block overflow-hidden rounded-xl shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
                   aria-label={`Shop ${cat.name}`}
                 >
@@ -578,7 +578,7 @@ export default function HomeView({ initialData }: { initialData: StoreInitialDat
             title="Featured Gear"
             action={
               <a
-                href="#/shop"
+                href="/shop"
                 className="text-sm font-bold text-emerald-700 transition-colors hover:text-emerald-800"
               >
                 View all →
@@ -598,7 +598,7 @@ export default function HomeView({ initialData }: { initialData: StoreInitialDat
                 Browse the full range in the shop while we update this shelf.
               </p>
               <Button asChild className="mt-5 h-11 bg-emerald-700 font-semibold text-white hover:bg-emerald-800">
-                <a href="#/shop">Browse All Gear</a>
+                <a href="/shop">Browse All Gear</a>
               </Button>
             </div>
           )}
@@ -635,7 +635,7 @@ export default function HomeView({ initialData }: { initialData: StoreInitialDat
                   asChild
                   className="h-12 bg-amber-500 px-7 text-sm font-bold uppercase tracking-wide text-amber-950 hover:bg-amber-400"
                 >
-                  <a href="#/shop?category=cricket">
+                  <a href="/shop?category=cricket">
                     <ShoppingCart className="size-4" aria-hidden="true" />
                     Shop Cricket Now
                   </a>

@@ -122,9 +122,10 @@ export default function ProductView({ slug }: { slug: string }) {
   }, [product]);
 
   /* Product structured data (JSON-LD). Injected client-side because product
-   * views are SPA hash routes (#/product/<slug>) — there is no per-product
-   * server-rendered URL to attach it to in the document head. Removed on
-   * unmount / re-navigation so only one product schema exists at a time. */
+   * views are client-side routes (/product/<slug>) — the SPA shell is a
+   * single server-rendered page, so the per-product schema is added to the
+   * document head on demand. Removed on unmount / re-navigation so only one
+   * product schema exists at a time. */
   useEffect(() => {
     if (!product) return;
     document.getElementById("product-jsonld")?.remove();
@@ -144,7 +145,7 @@ export default function ProductView({ slug }: { slug: string }) {
         priceCurrency: "PKR",
         availability:
           product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-        url: `${SITE_URL}/#/product/${product.slug}`,
+        url: `${SITE_URL}/product/${product.slug}`,
       },
     };
     if (product.reviewCount > 0) {
@@ -178,7 +179,7 @@ export default function ProductView({ slug }: { slug: string }) {
           This product may be out of stock or the link is no longer valid.
         </p>
         <Button asChild className="mt-2 h-12 bg-emerald-700 px-8 text-base font-semibold text-white hover:bg-emerald-800">
-          <a href="#/shop">Back to Shop</a>
+          <a href="/shop">Back to Shop</a>
         </Button>
       </section>
     );
@@ -229,7 +230,7 @@ export default function ProductView({ slug }: { slug: string }) {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <a href="#/" className="hover:text-emerald-700">
+              <a href="/" className="hover:text-emerald-700">
                 Home
               </a>
             </BreadcrumbLink>
@@ -238,7 +239,7 @@ export default function ProductView({ slug }: { slug: string }) {
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
               <a
-                href={`#/shop?category=${encodeURIComponent(product.categorySlug)}`}
+                href={`/shop?category=${encodeURIComponent(product.categorySlug)}`}
                 className="hover:text-emerald-700"
               >
                 {product.categoryName}
